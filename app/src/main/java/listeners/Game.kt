@@ -1,7 +1,7 @@
 package listeners
 
-import android.arch.lifecycle.MutableLiveData
-import android.arch.lifecycle.ViewModel
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
 class Game : ViewModel() {
     var selectedCellLiveData = MutableLiveData<Pair<Int, Int>>();

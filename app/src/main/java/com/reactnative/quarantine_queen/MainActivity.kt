@@ -1,9 +1,9 @@
 package com.reactnative.quarantine_queen
 
-import android.arch.lifecycle.Observer
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.synthetic.main.activity_main.*
 import listeners.QueenListener
 import viewModel.BoardViewModel
@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity(), QueenListener {
     private fun updateMappedQueenUI(value: Int?) = value?.let {
         boardView.updateQueenCount(value)
     }
-
 
     private fun updateGridCellsUI(grid: Array<Array<String>>?) = grid?.let {
         boardView.updateGrid(grid)
