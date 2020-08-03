@@ -1,8 +1,7 @@
 package viewModel
 
-import androidx.lifecycle.ViewModel
 import android.util.Log
-import listeners.Game
+import androidx.lifecycle.ViewModel
 
 class BoardViewModel : ViewModel() {
 
@@ -15,5 +14,6 @@ class BoardViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         Log.i("BoardViewModel", "BoardViewModel destroyed!")
+//        println(game.selectedCellLiveData.value?.first)
     }
 }

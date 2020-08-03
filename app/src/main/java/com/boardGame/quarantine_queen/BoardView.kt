@@ -1,4 +1,4 @@
-package com.reactnative.quarantine_queen
+package com.boardGame.quarantine_queen
 
 //import listeners.QueenListener
 
@@ -17,11 +17,11 @@ import kotlin.math.min
 class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, attributeSet) {
 
 
-    private lateinit var grid: Array<Array<String>>;
-    private lateinit var conflictedMap: HashMap<String, ArrayList<String>>;
+    private lateinit var grid: Array<Array<String>>
+    private lateinit var conflictedMap: HashMap<String, ArrayList<String>>
     private var listener: QueenListener? = null
-    private val count: Int = 8
-    private var availableQueen = 8
+    private var count: Int = 4
+    private var availableQueen = 4
     private val hint: Boolean = true
     private var cellPixel: Float = 1f
     private var selectedRow = -1
@@ -73,18 +73,21 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         }
     }
 
-    private fun handleTouch(row: Float, column: Float) {
-
-        val touchedrow = (row / cellPixel).toInt()
-        val touchedCol = (column / cellPixel).toInt()
-        listener?.selectCell(touchedrow, touchedCol)
-    }
-
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val squareSize = min(widthMeasureSpec, heightMeasureSpec)
         println(squareSize)
         setMeasuredDimension(squareSize, squareSize)
     }
+
+    private fun handleTouch(row: Float, column: Float) {
+
+        val touchedRow = (row / cellPixel).toInt()
+        val touchedCol = (column / cellPixel).toInt()
+        listener?.selectCell(touchedRow, touchedCol)
+//        addQueen(touchedRow,touchedCol)
+    }
+
+
 
     override fun onDraw(canvas: Canvas) {
         cellPixel = (width / count).toFloat()
@@ -141,7 +144,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {
-        if (grid[row][column] == textValue) {
+        if (this.grid[row][column] == textValue) {
             canvas.drawRect(
                 row * cellPixel,
                 column * cellPixel,
@@ -149,10 +152,10 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
                 (column + 1) * cellPixel, if (hasConflict(row, column)) wrongCell else selectedCell
             )
 
-            var bounds: Rect = Rect()
-            cellText.getTextBounds(grid[row][column], 0, grid[row][column].length, bounds)
-            var textWidth: Int = bounds.width()
-            var textHeight: Int = bounds.height()
+            val bounds = Rect()
+            cellText.getTextBounds(this.grid[row][column], 0, this.grid[row][column].length, bounds)
+            val textWidth: Int = bounds.width()
+            val textHeight: Int = bounds.height()
             canvas.drawText(
                 grid[row][column],
                 (row * cellPixel) + (cellPixel / 2) - (textWidth / 2),
@@ -173,17 +176,6 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     private fun fillGridCell(canvas: Canvas) {
         if (selectedColumn == -1 || selectedRow == -1) return
-        if (grid[selectedRow][selectedColumn] == textValue) {
-            grid[selectedRow][selectedColumn] = ""
-            listener?.conflictUpdate(selectedRow, selectedColumn, 0)
-            listener?.change(-1)
-        } else {
-            if (availableQueen > 0) {
-                grid[selectedRow][selectedColumn] = textValue
-                listener?.change(1)
-            }
-        }
-        listener?.gridUpdate(grid);
         var status = true
 
         for (row in 0 until count) {
@@ -229,6 +221,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     fun addSelectedCell(row: Int, col: Int) {
         addQueen(row, col)
+        println("add queen called")
     }
 
     fun updateQueenCount(value: Int) {
@@ -241,6 +234,11 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     fun updateConflictMap(conflictMap: HashMap<String, ArrayList<String>>) {
         this.conflictedMap = conflictMap
+    }
+
+    fun updateBoardSize(size:Int){
+        count= size
+        availableQueen =size
     }
 
 }

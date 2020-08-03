@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context=".ui.mainActivity.MainActivityFragment"
+            android:gravity="center"
+            android:background="#56673AB7"
+            android:orientation="vertical">
+
+        <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:foregroundGravity="center"
+                android:orientation="horizontal"
+                android:overScrollMode="never"/>
+
+        <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/button_play"
+                android:paddingHorizontal="10dp"
+                android:textColor="@color/colorWhite"
+                android:background="@color/colorPrimary"
+                android:text="Play"/>
+
+    </LinearLayout>
+</layout>

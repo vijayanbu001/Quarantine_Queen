@@ -1,4 +1,4 @@
-package com.reactnative.quarantine_queen
+package com.boardGame.quarantine_queen
 
 import androidx.test.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4

@@ -1,4 +1,4 @@
-package com.reactnative.quarantine_queen
+package com.boardGame.quarantine_queen
 
 import org.junit.Test
 

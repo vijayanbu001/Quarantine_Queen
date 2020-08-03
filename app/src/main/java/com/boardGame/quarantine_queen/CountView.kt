@@ -1,4 +1,4 @@
-package com.reactnative.quarantine_queen
+package com.boardGame.quarantine_queen
 
 import android.content.Context
 import android.graphics.Canvas
@@ -58,12 +58,21 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
             (row + 1) * cellPixel, gridLine
         )
         with(canvas) {
-            drawText(text, (column * cellPixel) + (cellPixel / 2) - 20f, (row * cellPixel) + (cellPixel / 2) + 15f, cellText)
+            drawText(
+                text,
+                (column * cellPixel) + (cellPixel / 2) - 20f,
+                (row * cellPixel) + (cellPixel / 2) + 15f,
+                cellText
+            )
         }
     }
 
     fun updateQueenGrid(availableQueenList: ArrayList<String>) {
         this.availableQueenList = availableQueenList
         invalidate()
+    }
+
+    fun updateBoardSize(size: Int) {
+        count = size
     }
 }

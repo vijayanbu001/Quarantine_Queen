@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/nav_graph"
+        app:startDestination="@id/splashScreenFragment">
+
+    <fragment
+            android:id="@+id/splashScreenFragment"
+            android:name="com.boardGame.quarantine_queen.ui.mainActivity.SplashScreenFragment"
+            android:label="fragment_splash_screen"
+            tools:layout="@layout/fragment_splash_screen">
+        <action
+                android:id="@+id/action_splashScreenFragment_to_mainActivityFragment"
+                app:destination="@id/mainActivityFragment"
+                app:enterAnim="@anim/nav_default_enter_anim"
+                app:popUpTo="@id/splashScreenFragment"
+                app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+            android:id="@+id/mainActivityFragment"
+            android:name="com.boardGame.quarantine_queen.ui.mainActivity.MainActivityFragment"
+            android:label="MainActivity2Fragment"
+            tools:layout="@layout/main_activity_fragment">
+        <action
+                android:id="@+id/action_mainActivityFragment_to_gameLevelFragment"
+                app:destination="@id/gameLevelFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/gameFragment"
+            android:name="com.boardGame.quarantine_queen.GameFragment"
+            android:label="game_fragment"
+            tools:layout="@layout/game_fragment">
+        <argument
+                android:name="gridSize"
+                android:defaultValue="4"
+                app:argType="integer" />
+    </fragment>
+    <fragment
+            android:id="@+id/gameLevelFragment"
+            android:name="com.boardGame.quarantine_queen.GameLevelFragment"
+            android:label="GameLevelFragment">
+        <argument
+                android:name="gridSize"
+                android:defaultValue="4"
+                app:argType="integer" />
+        <action
+                android:id="@+id/action_gameLevelFragment_to_gameFragment"
+                app:destination="@id/gameFragment" />
+    </fragment>
+
+</navigation>
