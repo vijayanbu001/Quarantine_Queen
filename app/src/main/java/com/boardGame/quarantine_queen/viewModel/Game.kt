@@ -1,4 +1,4 @@
-package viewModel
+package com.boardGame.quarantine_queen.viewModel
 
 import androidx.lifecycle.MutableLiveData
 
@@ -8,11 +8,13 @@ class Game {
     var grid = MutableLiveData<Array<Array<String>>>()
     var countGridLiveData = MutableLiveData<ArrayList<String>>()
     var conflictLiveMap = MutableLiveData<HashMap<String, ArrayList<String>>>()
-    private var boardSize: Int = 4
+    var progressList = MutableLiveData<ArrayList<String>>()
+    var boardSize: Int = 4
     private var selectedRow = -1
     private var selectedCol = -1
     private lateinit var countArray: ArrayList<String>
     private var textValue = "Q"
+
 
     private fun initialSetup(size: Int) {
         boardSize = size
@@ -24,12 +26,16 @@ class Game {
         selectedCellLiveData.value = Pair(selectedRow, selectedCol)
         availableQueens.value = boardSize
         conflictLiveMap.value = HashMap()
-
+//        progressList.value = getDefaultList(boardSize)
     }
 
-    fun updateSelectedCell(row: Int, col: Int) {
-        selectedCellLiveData.value = (Pair(row, col))
-        updateGridCell(row, col)
+
+
+    fun updateSelectedCell(row: Int, col: Int, userAction: Boolean = true) {
+        if (row > -1 && col > -1) {
+            selectedCellLiveData.value = (Pair(row, col))
+            updateGridCell(row, col, userAction)
+        }
 //          selectedRow = row
 //          selectedCol = col
     }
@@ -59,17 +65,36 @@ class Game {
         this.grid.value = (grid)
     }
 
-    private fun updateGridCell(row: Int, col: Int) {
+    private fun updateGridCell(row: Int, col: Int, userAction: Boolean) {
 
         if (this.grid.value!![row][col] == textValue) {
             grid.value!![row][col] = ""
             updateConflictMap(row, col, 0)
             updateAvailableQueenCount(-1)
+            if (userAction) {
+                updateProgressList(row, col, 0)
+            }
         } else {
             if (availableQueens.value!! > 0) {
                 grid.value!![row][col] = textValue
                 updateAvailableQueenCount(1)
+                if (userAction) {
+                    println("updating progress list")
+                    updateProgressList(row, col, 1)
+                }
             }
+        }
+    }
+
+    private fun updateProgressList(row: Int, column: Int, operation: Int) {
+        var updatedList = ArrayList(progressList.value)
+        if (operation == 1) {
+            updatedList[column] = row.toString()
+            progressList.value = updatedList
+            println("ProgressList value ${progressList.value}")
+        } else {
+            updatedList[column] = "-1"
+            progressList.value = updatedList
         }
     }
 

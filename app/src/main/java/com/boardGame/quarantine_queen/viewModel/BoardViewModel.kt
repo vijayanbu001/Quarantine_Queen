@@ -1,4 +1,4 @@
-package viewModel
+package com.boardGame.quarantine_queen.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

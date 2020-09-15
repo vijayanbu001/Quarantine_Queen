@@ -10,6 +10,7 @@ class MainActivity : AppCompatActivity() {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+
     }
 
     override fun onSupportNavigateUp() =

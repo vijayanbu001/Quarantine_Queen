@@ -1,4 +1,4 @@
-package database
+package com.boardGame.quarantine_queen.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

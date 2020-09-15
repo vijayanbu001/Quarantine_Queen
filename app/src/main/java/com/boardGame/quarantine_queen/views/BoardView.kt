@@ -1,6 +1,6 @@
-package com.boardGame.quarantine_queen
+package com.boardGame.quarantine_queen.views
 
-//import listeners.QueenListener
+//import com.boardGame.quarantine_queen.listeners.QueenListener
 
 import android.content.Context
 import android.graphics.Canvas
@@ -10,7 +10,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import listeners.QueenListener
+import com.boardGame.quarantine_queen.listeners.QueenListener
 import kotlin.math.min
 
 
@@ -80,13 +80,14 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun handleTouch(row: Float, column: Float) {
+        println("$row, $column")
 
         val touchedRow = (row / cellPixel).toInt()
         val touchedCol = (column / cellPixel).toInt()
+        println("$touchedRow, $touchedCol")
         listener?.selectCell(touchedRow, touchedCol)
 //        addQueen(touchedRow,touchedCol)
     }
-
 
 
     override fun onDraw(canvas: Canvas) {
@@ -178,11 +179,15 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         if (selectedColumn == -1 || selectedRow == -1) return
         var status = true
 
-        for (row in 0 until count) {
-            for (column in 0 until count) {
+        for (column in 0 until count) {
+            for (row in 0 until count) {
                 if (!isSelectedCell(row, column)) {
 
-                    if (isConflictCell(row, column) && grid[selectedRow][selectedColumn] == textValue) {
+                    if (isConflictCell(
+                            row,
+                            column
+                        ) && grid[selectedRow][selectedColumn] == textValue
+                    ) {
                         if (grid[row][column] == textValue
                         ) {
                             listener?.conflictUpdate(row, column, 1)
@@ -236,9 +241,9 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         this.conflictedMap = conflictMap
     }
 
-    fun updateBoardSize(size:Int){
-        count= size
-        availableQueen =size
+    fun updateBoardSize(size: Int) {
+        count = size
+        availableQueen = size
     }
 
 }

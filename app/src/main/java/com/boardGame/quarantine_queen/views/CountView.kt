@@ -1,4 +1,4 @@
-package com.boardGame.quarantine_queen
+package com.boardGame.quarantine_queen.views
 
 import android.content.Context
 import android.graphics.Canvas

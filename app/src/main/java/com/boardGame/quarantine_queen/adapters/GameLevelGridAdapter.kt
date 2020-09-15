@@ -1,4 +1,4 @@
-package com.boardGame.quarantine_queen
+package com.boardGame.quarantine_queen.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.databinding.DataBindingUtil
+import com.boardGame.quarantine_queen.R
 import com.boardGame.quarantine_queen.databinding.GameLevelGridItemBinding
 
 class GameLevelGridAdapter(private val imageList: List<Pair<Int, Int>>) : BaseAdapter() {

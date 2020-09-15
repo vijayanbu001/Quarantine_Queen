@@ -1,4 +1,4 @@
-package com.boardGame.quarantine_queen.ui.mainActivity.adapters
+package com.boardGame.quarantine_queen.adapters
 
 import android.view.LayoutInflater
 import android.view.View
