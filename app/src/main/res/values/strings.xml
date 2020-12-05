@@ -1,7 +1,9 @@
 <resources>
-    <string name="app_name">Quarantine_Queen</string>
+    <string name="app_name">Quarantine Queen</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+<!--    <string name="app_title">Quarantine Queen</string>-->
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="board_type">board type</string>
+    <string name="play">Play</string>
 </resources>

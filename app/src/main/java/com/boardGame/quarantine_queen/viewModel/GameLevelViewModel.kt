@@ -1,20 +1,24 @@
 package com.boardGame.quarantine_queen.viewModel
 
 import android.app.Application
-import androidx.lifecycle.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.boardGame.quarantine_queen.database.QueenDatabase
 import com.boardGame.quarantine_queen.database.entity.GridDetail
 import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
 import com.boardGame.quarantine_queen.repository.QueenRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlin.coroutines.EmptyCoroutineContext
 
 class GameLevelViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: QueenRepository
     var gridDetails: LiveData<List<GridDetail>>
-    var gridSolutionDetails: LiveData<List<GridSolutionDetail>>
+    var gridSolutionDetails: MutableLiveData<List<GridSolutionDetail>> =
+        MutableLiveData()
     lateinit var progressDetailBySize: LiveData<List<ProgressDetail>>
     lateinit var gridSolutionDetailBySize: LiveData<List<GridSolutionDetail>>
     var game: Game = Game()
@@ -23,10 +27,12 @@ class GameLevelViewModel(application: Application) : AndroidViewModel(applicatio
         val dao = QueenDatabase.getDatabase(application).dao()
         repository = QueenRepository(dao)
         gridDetails = repository.getAllGridDetails
-        gridSolutionDetails =
-            repository.getGridSolutionDetails.asLiveData(EmptyCoroutineContext, 1000)
+        viewModelScope.launch {
+            repository.getGridSolutionDetails.collect {
+                gridSolutionDetails.value = it
+            }
+        }
     }
-
 
     fun fetchGridDetailBySize(gridSize: Int) {
         gridSolutionDetailBySize = repository.getGridSolutionDetailBySize(gridSize)
@@ -41,7 +47,7 @@ class GameLevelViewModel(application: Application) : AndroidViewModel(applicatio
         gridDetails =
             MutableLiveData<ArrayList<GridDetail>>(_gridDetails) as LiveData<List<GridDetail>>
         gridSolutionDetails =
-            MutableLiveData<ArrayList<GridSolutionDetail>>(_gridSolutionDetails) as LiveData<List<GridSolutionDetail>>
+            MutableLiveData(_gridSolutionDetails)
         insertDetails(_gridDetails)
         insertGridSolutionDetails(_gridSolutionDetails)
         insertProgressDetails(_progressDetails)
@@ -72,6 +78,10 @@ class GameLevelViewModel(application: Application) : AndroidViewModel(applicatio
     fun setProgressList(userSolutionList: ArrayList<String>?) = userSolutionList?.let {
         println("setting progress list $it")
         game.progressList.value = it
+    }
+
+    fun updateStatus(gridSolutionDetail: GridSolutionDetail) {
+        viewModelScope.launch { repository.updateStatus(gridSolutionDetail) }
     }
 
 }

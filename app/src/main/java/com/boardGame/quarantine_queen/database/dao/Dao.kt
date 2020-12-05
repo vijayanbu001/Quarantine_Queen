@@ -23,7 +23,7 @@ interface Dao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertAllGridSolutionDetails(gridSolutionDetail: List<GridSolutionDetail>)
 
-    @Query("SELECT * FROM GridSolutionDetail")
+    @Query("SELECT * FROM GridSolutionDetail order by size asc, status desc")
     fun getAllGridSolutionDetails(): Flow<List<GridSolutionDetail>>
 
     @Query("SELECT * FROM GridSolutionDetail where size= :size order by status_Order")
@@ -44,7 +44,4 @@ interface Dao {
 
     @Update
     suspend fun updateProgressDetail(progressDetail: ProgressDetail)
-//    fun updateStatus
-    // update user solution list
-
 }

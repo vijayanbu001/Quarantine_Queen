@@ -6,13 +6,20 @@
             android:layout_height="match_parent"
             android:padding="20dp">
 
-        <ImageView
-                android:id="@+id/item_image"
+        <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:contentDescription="game level"
-                android:src="@color/cardview_shadow_end_color" />
+                android:layout_margin="10dp"
+                android:elevation="60dp">
 
+            <ImageView
+                    android:id="@+id/item_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:contentDescription="game level"
+                    android:layout_margin="10dp"
+                    android:src="@color/cardview_shadow_end_color" />
+
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </layout>

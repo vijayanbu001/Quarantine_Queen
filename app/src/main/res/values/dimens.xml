@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="pageMargin">20dp</dimen>
+    <dimen name="xSmall">8dp</dimen>
+    <dimen name="Small">16dp</dimen>
+    <dimen name="medium">24dp</dimen>
+    <dimen name="large">32dp</dimen>
     <dimen name="pagerOffset">10dp</dimen>
-    <dimen name="pageMarginAndoffset">10dp</dimen>
+    <dimen name="pageMarginAndOffset">10dp</dimen>
+    <dimen name="cardRadius">5dp</dimen>
+    <dimen name="cardElevation">60dp</dimen>
+    <dimen name="LayoutPadding">20dp</dimen>
+
 </resources>

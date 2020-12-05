@@ -30,14 +30,11 @@ class Game {
     }
 
 
-
     fun updateSelectedCell(row: Int, col: Int, userAction: Boolean = true) {
-        if (row > -1 && col > -1) {
+        if (row > -1 && col > -1 && boardSize > row && boardSize > col) {
             selectedCellLiveData.value = (Pair(row, col))
             updateGridCell(row, col, userAction)
         }
-//          selectedRow = row
-//          selectedCol = col
     }
 
     fun updateBoardSize(size: Int) {
@@ -66,7 +63,6 @@ class Game {
     }
 
     private fun updateGridCell(row: Int, col: Int, userAction: Boolean) {
-
         if (this.grid.value!![row][col] == textValue) {
             grid.value!![row][col] = ""
             updateConflictMap(row, col, 0)
@@ -79,7 +75,6 @@ class Game {
                 grid.value!![row][col] = textValue
                 updateAvailableQueenCount(1)
                 if (userAction) {
-                    println("updating progress list")
                     updateProgressList(row, col, 1)
                 }
             }
@@ -87,11 +82,10 @@ class Game {
     }
 
     private fun updateProgressList(row: Int, column: Int, operation: Int) {
-        var updatedList = ArrayList(progressList.value)
+        val updatedList = ArrayList(progressList.value)
         if (operation == 1) {
             updatedList[column] = row.toString()
             progressList.value = updatedList
-            println("ProgressList value ${progressList.value}")
         } else {
             updatedList[column] = "-1"
             progressList.value = updatedList

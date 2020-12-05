@@ -1,7 +1,6 @@
 package com.boardGame.quarantine_queen.fragments
 
 import TrackBot
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +14,7 @@ import com.boardGame.quarantine_queen.Status
 import com.boardGame.quarantine_queen.database.entity.GridDetail
 import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
+import com.boardGame.quarantine_queen.utils.toStringList
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
 import kotlinx.coroutines.*
 
@@ -23,36 +23,25 @@ import kotlinx.coroutines.*
  */
 class SplashScreenFragment : Fragment() {
 
-    val viewModel by activityViewModels<GameLevelViewModel>()
-    val job = SupervisorJob();
-    val scope = CoroutineScope(Dispatchers.Main + job)
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        println("attaching splash fragment")
-    }
+    private val viewModel by activityViewModels<GameLevelViewModel>()
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.Main + job)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        println("creating splash fragment")
         viewModel.gridDetails.observe(viewLifecycleOwner, Observer { updateGameBoardSizeLimit(it) })
         return inflater.inflate(R.layout.fragment_splash_screen, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        println("created splash fragment")
-
         scope.launch { openMainScreen() }
-
     }
 
     private fun updateGameBoardSizeLimit(it: List<GridDetail>?) {
-        println("=======>$it")
         if (it.isNullOrEmpty()) {
-            print("sample initialising")
-//            initialDataSetter()
             scope.launch { initialDataSetter() }
         }
 
@@ -68,16 +57,16 @@ class SplashScreenFragment : Fragment() {
             trackBotInstance.trackBot(grid)
         }
         val gridSolutionIndexMap = trackBotInstance.getSolutionIndex()
-        var gridDetails = ArrayList<GridDetail>();
-        var gridSolutionDetails = ArrayList<GridSolutionDetail>()
-        var progressDetails = ArrayList<ProgressDetail>()
+        val gridDetails = ArrayList<GridDetail>()
+        val gridSolutionDetails = ArrayList<GridSolutionDetail>()
+        val progressDetails = ArrayList<ProgressDetail>()
         for ((size, solutionList) in gridSolutionIndexMap) {
-            var gridDetail = GridDetail(size, "$size Queen", solutionList.size)
+            val gridDetail = GridDetail(size, "$size Queen", solutionList.size)
             solutionList.forEachIndexed { solutionIndex, solution ->
-                var gridSolutionDetail = GridSolutionDetail()
-                var progressDetail = ProgressDetail("${size}_${solutionIndex + 1}")
+                val gridSolutionDetail = GridSolutionDetail()
+                val progressDetail = ProgressDetail("${size}_${solutionIndex + 1}")
                 gridSolutionDetail.size = size
-                gridSolutionDetail.solutionList = solution.toList() as ArrayList<String>
+                gridSolutionDetail.solutionList = solution.toStringList() as ArrayList<String>
                 progressDetail.userSolutionList= getDefaultList(size)
                 if (solutionIndex == 0) {
                     progressDetail.status = Status.PROGRESS.value
@@ -97,19 +86,17 @@ class SplashScreenFragment : Fragment() {
         }
 
         viewModel.initializeData(gridDetails, gridSolutionDetails, progressDetails)
-//        viewModel.insertSolutionDetails(gridSolutionDetails)
     }
 
     private fun getDefaultList(size: Int): ArrayList<String> {
-        var emptyList = ArrayList<String>(size);
+        val emptyList = ArrayList<String>(size)
         for (i in 0 until size) {
             emptyList.add("-1")
         }
-        return emptyList;
+        return emptyList
     }
     private suspend fun openMainScreen() {
         delay(3000)
-        print("opening main screen")
         findNavController()
             .navigate(R.id.action_splashScreenFragment_to_mainActivityFragment)
     }

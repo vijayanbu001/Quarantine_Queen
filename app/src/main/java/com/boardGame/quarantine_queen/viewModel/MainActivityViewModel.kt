@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: QueenRepository
-    val gridDetails:LiveData<List<GridDetail>>
+    private val gridDetails:LiveData<List<GridDetail>>
 //    val sharedPrefFile = "qQueenSharedPref"
 //    val sharedPreferences: SharedPreferences = application.getSharedPreferences(sharedPrefFile, Context.MODE_PRIVATE)
 

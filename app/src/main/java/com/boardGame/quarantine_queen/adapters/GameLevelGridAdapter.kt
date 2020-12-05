@@ -33,5 +33,4 @@ class GameLevelGridAdapter(private val imageList: List<Pair<Int, Int>>) : BaseAd
     override fun getCount(): Int {
         return imageList.size
     }
-
 }

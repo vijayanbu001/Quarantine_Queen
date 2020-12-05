@@ -1,6 +1,7 @@
 package com.boardGame.quarantine_queen.fragments
 
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,54 +11,46 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.boardGame.quarantine_queen.R
+import com.boardGame.quarantine_queen.Status
+import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
 import com.boardGame.quarantine_queen.listeners.QueenListener
 import com.boardGame.quarantine_queen.viewModel.Game
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
+import kotlin.collections.ArrayList
 
 class GameFragment : Fragment(), QueenListener {
+
 
     private val viewModel by activityViewModels<GameLevelViewModel>()
     private lateinit var game: Game
     private lateinit var selectedSolutionDetail: ProgressDetail
+    private lateinit var solutionList: ArrayList<ProgressDetail>
+    private var existingSolutionList: ArrayList<GridSolutionDetail> =
+        ArrayList<GridSolutionDetail>()
+    private val dialog = GameOverDialogFragment()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.game_fragment, container, false)
+        val updatedInflater = inflater.cloneInContext(ContextThemeWrapper(activity,R.style.DarkTheme))
+        return updatedInflater.inflate(R.layout.game_fragment, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         boardView.registerListener(this)
         game = viewModel.game
-        var args = GameFragmentArgs.fromBundle(
+        val args = GameFragmentArgs.fromBundle(
             requireArguments()
         )
         updateBoardSize(args.gridSize)
-
-        /*  viewModel.gridSolutionDetailBySize.observe(viewLifecycleOwner, Observer {
-              it?.let {
-                  println("fetched grid details ====> $it, ${args.position}")
-                  if (it.size > args.position) {
-                      var selectedGridSolutionDetail = it[args.position]
-                      println("fetched grid details $selectedGridSolutionDetail")
-                      *//* selectedGridSolutionDetail?.userSolutionList?.forEachIndexed { index, item ->
-                         selectCell(
-                             item.toInt(),
-                             index,
-                             false
-                         )
-                     }
-                 *//*
-                }
-            }
-        })*/
-        viewModel.progressDetailBySize.observeOnce(viewLifecycleOwner, Observer { progressDetails ->
-            progressDetails?.let { progressDetails ->
+        viewModel.progressDetailBySize.observeOnce(viewLifecycleOwner, Observer {
+            it?.let { progressDetails ->
+                solutionList = progressDetails as ArrayList<ProgressDetail>
                 println("fetched grid details $progressDetails, ${args.position}")
                 selectedSolutionDetail = progressDetails[args.position]
                 if (selectedSolutionDetail.userSolutionList?.isNotEmpty()!!) {
@@ -71,7 +64,9 @@ class GameFragment : Fragment(), QueenListener {
                         )
                     }
 
-//                    statusUpdate()
+                    if (selectedSolutionDetail.status == Status.COMPLETED.value) {
+                        boardView.setReadonly()
+                    }
                 }
                 game.selectedCellLiveData.observe(
                     viewLifecycleOwner,
@@ -89,12 +84,16 @@ class GameFragment : Fragment(), QueenListener {
                 var count = 0
                 game.progressList.observe(viewLifecycleOwner, Observer {
                     println("updating user solution ${count++} ")
-                    updateUserSolution(it, args.gridSize, args.position)
+                    updateUserSolution(it, args.gridSize)
                 })
             }
         })
 
-
+        viewModel.gridSolutionDetailBySize.observeOnce(
+            viewLifecycleOwner,
+            Observer { gridSolutionDetails ->
+                existingSolutionList = gridSolutionDetails as ArrayList<GridSolutionDetail>
+            })
 
 
     }
@@ -109,17 +108,21 @@ class GameFragment : Fragment(), QueenListener {
         })
     }
 
-    private fun updateUserSolution(progressList: ArrayList<String>?, size: Int, position: Int) =
+    private fun updateUserSolution(progressList: ArrayList<String>?, size: Int) =
         progressList?.let {
             println("updating user solution list $progressList")
-            var progressDetail = ProgressDetail(selectedSolutionDetail.id)
-            progressDetail.size = size;
-            progressDetail.createdDate = selectedSolutionDetail.createdDate;
+            val progressDetail = ProgressDetail(selectedSolutionDetail.id)
+            progressDetail.size = size
+            progressDetail.createdDate = selectedSolutionDetail.createdDate
             progressDetail.userSolutionList = it
-
-            /*var progressDetails = ArrayList<ProgressDetail>()
-            progressDetails.add(progressDetail)
-            println("progressDetails $progressDetails")*/
+            if (gameOver(it)) {
+                progressDetail.status = Status.COMPLETED.value
+            } else {
+                progressDetail.status = when (selectedSolutionDetail.status == 0) {
+                    true -> Status.PROGRESS.value
+                    else -> selectedSolutionDetail.status
+                }
+            }
             viewModel.updateUserSolution(progressDetail)
         }
 
@@ -138,7 +141,7 @@ class GameFragment : Fragment(), QueenListener {
     private fun updateConflictCellUI(conflictMap: HashMap<String, ArrayList<String>>?) =
         conflictMap?.let {
             boardView.updateConflictMap(conflictMap)
-            println("observer2")
+            println("observer2 ${it.size}")
 
         }
 
@@ -175,6 +178,31 @@ class GameFragment : Fragment(), QueenListener {
     override fun conflictUpdate(row: Int, column: Int, operation: Int) {
         println("conflictUpdate function")
         game.updateConflictMap(row, column, operation)
+    }
+
+    fun gameOver(progressList: ArrayList<String>): Boolean {
+        println("userSolutionList $solutionList $existingSolutionList")
+        val currentSolution = progressList.joinToString("")
+        if (boardView.gameCompleted()) {
+            existingSolutionList.forEach { gridSolutionDetail ->
+                println("gridSolutionDetail ${gridSolutionDetail.solutionList}")
+                if (gridSolutionDetail.status != Status.COMPLETED.value && selectedSolutionDetail.status != Status.COMPLETED.value) {
+                    if (gridSolutionDetail.solutionList.joinToString("") == (currentSolution)) {
+                        dialog.show(
+                            requireActivity().supportFragmentManager,
+                            "GameOverDialogFragment"
+                        )
+                        gridSolutionDetail.userSolutionList = gridSolutionDetail.solutionList
+                        gridSolutionDetail.status = Status.COMPLETED.value
+                        println("selectedSolutionDetail $selectedSolutionDetail")
+                        viewModel.updateStatus(gridSolutionDetail)
+                        return true
+                    }
+                }
+            }
+
+        }
+        return false
     }
 
 }

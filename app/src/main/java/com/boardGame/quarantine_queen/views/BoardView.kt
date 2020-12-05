@@ -1,7 +1,5 @@
 package com.boardGame.quarantine_queen.views
 
-//import com.boardGame.quarantine_queen.listeners.QueenListener
-
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
@@ -11,6 +9,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import com.boardGame.quarantine_queen.listeners.QueenListener
+import com.boardGame.quarantine_queen.utils.GridColor
+import com.boardGame.quarantine_queen.utils.drawCellWithDimension
 import kotlin.math.min
 
 
@@ -18,7 +18,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
 
     private lateinit var grid: Array<Array<String>>
-    private lateinit var conflictedMap: HashMap<String, ArrayList<String>>
+    private var conflictedMap: HashMap<String, ArrayList<String>> = HashMap()
     private var listener: QueenListener? = null
     private var count: Int = 4
     private var availableQueen = 4
@@ -27,12 +27,12 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     private var selectedRow = -1
     private var selectedColumn = -1
     private var textValue = "Q"
-    private val gridLine = Paint().apply {
+    /*private val gridLine = Paint().apply {
         color = Color.BLACK
-        strokeWidth = 2f
+        strokeWidth = 1f
         isAntiAlias = true
         style = Paint.Style.STROKE
-    }
+    }*/
     private val selectedCell = Paint().apply {
         color = Color.GREEN
         isAntiAlias = true
@@ -47,12 +47,20 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         style = Paint.Style.FILL
 
     }
-    private val conflictedCell = Paint().apply {
+    private val hintCell = Paint().apply {
         color = if (hint) Color.LTGRAY else Color.WHITE
         strokeWidth = 1f
         isAntiAlias = true
-        style = Paint.Style.FILL
+        style = Paint.Style.FILL_AND_STROKE
     }
+
+    private val blankCell = Paint().apply {
+        color = Color.WHITE
+        strokeWidth = 1f
+        isAntiAlias = true
+        style = Paint.Style.FILL_AND_STROKE
+    }
+
     private val cellText = Paint().apply {
         color = Color.BLUE
         strokeWidth = 3f
@@ -60,7 +68,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         isAntiAlias = true
         style = Paint.Style.FILL_AND_STROKE
     }
-
+    private var readOnly = false
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return when (event.action) {
@@ -69,7 +77,6 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
                 true
             }
             else -> false
-
         }
     }
 
@@ -80,79 +87,63 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun handleTouch(row: Float, column: Float) {
-        println("$row, $column")
-
         val touchedRow = (row / cellPixel).toInt()
         val touchedCol = (column / cellPixel).toInt()
         println("$touchedRow, $touchedCol")
-        listener?.selectCell(touchedRow, touchedCol)
-//        addQueen(touchedRow,touchedCol)
+        if (!readOnly) {
+            listener?.selectCell(touchedRow, touchedCol)
+        }
     }
 
 
     override fun onDraw(canvas: Canvas) {
         cellPixel = (width / count).toFloat()
-
+        drawGrid(canvas)
+        drawCells(canvas)
         fillGridCell(canvas)
-
-        drawGridLine(canvas)
-        canvas.drawRect(0f, 0f, width.toFloat(), width.toFloat(), gridLine)
     }
 
-    private fun addQueen(row: Int, column: Int): Boolean {
-        val status = false
+    private fun addQueen(row: Int, column: Int) {
         selectedRow = row
         selectedColumn = column
         invalidate()
-        return status
     }
 
-    private fun trackBot(r: Int, c: Int) {
-        var i = r
-        var j = c
-        if (i < grid.size) {
-            if (j < grid.size) {
-                if ((i > -1 && j > -1) && addQueen(i, j)) {
-                    i++
-                    trackBot(i, 0)
+    /*  private fun trackBot(r: Int, c: Int) {
+          var i = r
+          var j = c
+          if (i < grid.size) {
+              if (j < grid.size) {
+                  if ((i > -1 && j > -1) && addQueen(i, j)) {
+                      i++
+                      trackBot(i, 0)
 
-                } else {
-                    if (i > -1 && j > -1) {
+                  } else {
+                      if (i > -1 && j > -1) {
 
-                        grid[i][j] = ""
-                        j++
-                        if (j == grid.size) {
-                            i--
-                            j = 0
-                        }
-                        trackBot(i, j)
-                    }
-                }
-            }
-        }
-    }
+                          grid[i][j] = ""
+                          j++
+                          if (j == grid.size) {
+                              i--
+                              j = 0
+                          }
+                          trackBot(i, j)
+                      }
+                  }
+              }
+          }
+      }*/
 
     private fun drawHints(canvas: Canvas, row: Int, column: Int) {
         if (grid[row][column] !== grid[selectedRow][selectedColumn]
         ) {
-            canvas.drawRect(
-                row * cellPixel,
-                column * cellPixel,
-                (row + 1) * cellPixel,
-                (column + 1) * cellPixel, conflictedCell
-            )
+            drawCell(canvas, row, column, hintCell)
         }
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {
         if (this.grid[row][column] == textValue) {
-            canvas.drawRect(
-                row * cellPixel,
-                column * cellPixel,
-                (row + 1) * cellPixel,
-                (column + 1) * cellPixel, if (hasConflict(row, column)) wrongCell else selectedCell
-            )
-
+            drawCell(canvas, row, column, if (hasConflict(row, column)) wrongCell else selectedCell)
             val bounds = Rect()
             cellText.getTextBounds(this.grid[row][column], 0, this.grid[row][column].length, bounds)
             val textWidth: Int = bounds.width()
@@ -177,12 +168,9 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     private fun fillGridCell(canvas: Canvas) {
         if (selectedColumn == -1 || selectedRow == -1) return
-        var status = true
-
         for (column in 0 until count) {
             for (row in 0 until count) {
                 if (!isSelectedCell(row, column)) {
-
                     if (isConflictCell(
                             row,
                             column
@@ -191,15 +179,12 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
                         if (grid[row][column] == textValue
                         ) {
                             listener?.conflictUpdate(row, column, 1)
-
-                            status = false
                         }
                         drawHints(canvas, row, column)
                     }
                 }
                 placeQueen(canvas, row, column)
                 placeQueen(canvas, selectedRow, selectedColumn)
-//                status = true;
             }
         }
     }
@@ -212,13 +197,22 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         return (selectedColumn == column || selectedRow == row) || (selectedColumn + selectedRow == column + row) || (selectedColumn - selectedRow) == (column - row)
     }
 
-    private fun drawGridLine(canvas: Canvas) {
-        for (i in 1 until count) {
-            canvas.drawLine(i * cellPixel, 0F, i * cellPixel, width.toFloat(), gridLine)
-            canvas.drawLine(0F, i * cellPixel, width.toFloat(), i * cellPixel, gridLine)
+    private fun drawCell(canvas: Canvas, row: Int, col: Int, paint: Paint) {
+        drawCellWithDimension(canvas, row, col, paint, cellPixel, cellPixel)
+    }
+
+    private fun drawCells(canvas: Canvas) {
+        for (row in 0 until count) {
+            for (col in 0 until count) {
+                drawCell(canvas, row, col, blankCell)
+//                drawCell(canvas, row, col, gridLine)
+            }
         }
     }
 
+    private fun drawGrid(canvas: Canvas) {
+        drawCellWithDimension(canvas, 0, 0, GridColor.GRID_FILL.paint, width.toFloat(), width.toFloat())
+    }
 
     fun registerListener(listener: QueenListener) {
         this.listener = listener
@@ -226,11 +220,11 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     fun addSelectedCell(row: Int, col: Int) {
         addQueen(row, col)
-        println("add queen called")
     }
 
     fun updateQueenCount(value: Int) {
         availableQueen = value
+//        listener?.gameOver()
     }
 
     fun updateGrid(grid: Array<Array<String>>) {
@@ -244,6 +238,14 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     fun updateBoardSize(size: Int) {
         count = size
         availableQueen = size
+    }
+
+    fun gameCompleted(): Boolean {
+        return (availableQueen == 0)
+    }
+
+    fun setReadonly() {
+        readOnly = true
     }
 
 }

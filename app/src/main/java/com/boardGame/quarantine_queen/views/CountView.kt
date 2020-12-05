@@ -6,11 +6,12 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import com.boardGame.quarantine_queen.utils.drawCellWithDimension
 
 
 class CountView(context: Context?, attributeSet: AttributeSet) : View(context, attributeSet) {
 
-    private var count: Int = 8
+    private var count: Int = 4
     private var availableQueenList: ArrayList<String> = ArrayList()
     private var cellPixel: Float = 0F
 
@@ -40,13 +41,19 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     override fun onDraw(canvas: Canvas) {
         fillGridCell(canvas)
-        canvas.drawRect(0f, 0f, width.toFloat(), cellPixel, gridLine)
+        drawGrid(canvas)
+//        canvas.drawRect(0f, 0f, width.toFloat(), cellPixel, gridLine)
     }
 
     private fun fillGridCell(canvas: Canvas) {
+        val row = 0
         for (col in 0 until count) {
-            placeQueen(canvas, 0, col)
+            placeQueen(canvas, row, col)
         }
+    }
+
+    private fun drawGrid(canvas: Canvas) {
+        drawCellWithDimension(canvas, 0, 0, gridLine, width.toFloat(), cellPixel)
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {

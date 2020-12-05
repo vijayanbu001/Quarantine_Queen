@@ -19,6 +19,10 @@ class QueenRepository(private val dao: Dao) {
         dao.insertAllGridSolutionDetails(gridSolutionDetails)
     }
 
+    suspend fun updateStatus(gridSolutionDetail: GridSolutionDetail){
+        dao.updateStatus(gridSolutionDetail)
+    }
+
     suspend fun insertGridDetails(gridDetails: ArrayList<GridDetail>) {
         dao.insertAllGridDetails(gridDetails)
     }

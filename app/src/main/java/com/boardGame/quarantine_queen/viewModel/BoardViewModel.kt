@@ -14,6 +14,5 @@ class BoardViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         Log.i("BoardViewModel", "BoardViewModel destroyed!")
-//        println(game.selectedCellLiveData.value?.first)
     }
 }

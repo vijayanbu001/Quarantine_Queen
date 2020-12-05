@@ -1,6 +1,5 @@
 package com.boardGame.quarantine_queen.fragments
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -18,7 +17,7 @@ import com.boardGame.quarantine_queen.adapters.GameBoardAdapter
 import com.boardGame.quarantine_queen.database.entity.GridDetail
 import com.boardGame.quarantine_queen.databinding.MainActivityFragmentBinding
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
-import kotlin.math.abs
+import java.lang.Math.abs
 
 
 class MainActivityFragment : Fragment() {
@@ -27,25 +26,21 @@ class MainActivityFragment : Fragment() {
     private lateinit var binding: MainActivityFragmentBinding
     private lateinit var viewpager: ViewPager2
     private lateinit var imageList: List<Pair<Int, Int>>
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        print("onAttach")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        println("fragment creation process")
+
+        viewModel.gridDetails.observe(viewLifecycleOwner, Observer {
+            println("grid details $it")
+            setViewPager(it)
+        })
+
         binding =
             DataBindingUtil.inflate(inflater, R.layout.main_activity_fragment, container, false)
-        viewModel.gridDetails.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                setViewPager(it)
-            }
-        })
-        viewModel.gridSolutionDetails.observe(viewLifecycleOwner, Observer { })
         return binding.root
     }
 
@@ -54,7 +49,7 @@ class MainActivityFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.buttonPlay.setOnClickListener {
-            var bundle: Bundle = Bundle()
+            val bundle = Bundle()
             val selectedGridSize = imageList[viewpager.currentItem].first
             bundle.putInt("gridSize", selectedGridSize)
             findNavController().navigate(
@@ -73,14 +68,14 @@ class MainActivityFragment : Fragment() {
         viewpager.clipChildren = false
 
 
-        val pageMargin = resources.getDimension(R.dimen.pageMargin).toFloat()
-        val pageOffset = resources.getDimension(R.dimen.pagerOffset).toFloat()
-        viewpager.setPageTransformer(ViewPager2.PageTransformer { page, position ->
+        val pageMargin = resources.getDimension(R.dimen.pageMargin)
+        val pageOffset = resources.getDimension(R.dimen.pagerOffset)
+        viewpager.setPageTransformer { page, position ->
             val myOffset: Float = position * -(2 * pageOffset + pageMargin)
             if (viewpager.orientation == ViewPager2.ORIENTATION_HORIZONTAL) {
                 println("abs(position) ${abs(position)} , $position , $myOffset ${viewpager.currentItem}")
                 page.translationY = abs(position) * pageOffset
-                page.alpha = Math.max(0.7f, 1 - abs(position))
+                page.alpha = 0.7f.coerceAtLeast(1 - abs(position))
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     page.translationZ = 10f
                 }
@@ -90,14 +85,12 @@ class MainActivityFragment : Fragment() {
                     page.translationX = myOffset
                 }
             }
-        })
+        }
     }
 
     private fun getImageList(it: List<GridDetail>): List<Pair<Int, Int>> {
-        var imageIdMap: HashMap<Int, Int> = HashMap()
-        it?.forEach { gridDetail ->
-            imageIdMap[gridDetail.qCount] = R.mipmap.ic_launcher
-        }
-        return imageIdMap.toList()
+        val imageIdMap: LinkedHashMap<Int, Int> = LinkedHashMap()
+        it.forEach { gridDetail -> imageIdMap[gridDetail.qCount] = R.mipmap.ic_launcher }
+       return imageIdMap.toList()
     }
 }
