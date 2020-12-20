@@ -17,13 +17,18 @@
     </style>
 
     <style name="DarkTheme" parent="AppTheme">
-        <item name="colorOnBackground">@color/primaryTextColor</item>
+        <item name="colorOnPrimary">@color/colorWhite</item>
+        <item name="colorOnBackground">@color/colorWhite</item>
         <item name="android:windowBackground">@color/black_overlay</item>
+        <item name="background">@color/black_overlay</item>
+
     </style>
 
     <style name="LightTheme" parent="AppTheme">
+        <item name="colorOnPrimary">@color/black_overlay</item>
         <item name="colorOnBackground">@color/black_overlay</item>
         <item name="android:windowBackground">@color/colorWhite</item>
+        <item name="background">@color/colorWhite</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.DayNight.NoActionBar">

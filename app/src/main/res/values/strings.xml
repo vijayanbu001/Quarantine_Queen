@@ -6,4 +6,5 @@
     <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="board_type">board type</string>
     <string name="play">Play</string>
+    <string name="game_level">game level</string>
 </resources>

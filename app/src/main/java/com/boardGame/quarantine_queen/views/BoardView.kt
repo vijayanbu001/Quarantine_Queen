@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import com.boardGame.quarantine_queen.listeners.QueenListener
 import com.boardGame.quarantine_queen.utils.GridColor
+import com.boardGame.quarantine_queen.utils.ThemeUtils.getBackgroundColor
 import com.boardGame.quarantine_queen.utils.drawCellWithDimension
 import kotlin.math.min
 
@@ -55,7 +56,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private val blankCell = Paint().apply {
-        color = Color.WHITE
+        color = getBackgroundColor()
         strokeWidth = 1f
         isAntiAlias = true
         style = Paint.Style.FILL_AND_STROKE
@@ -72,12 +73,12 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return when (event.action) {
-            MotionEvent.ACTION_DOWN -> {
-                handleTouch(event.x, event.y)
-                true
+                MotionEvent.ACTION_DOWN -> {
+                    handleTouch(event.x, event.y)
+                    true
+                }
+                else -> false
             }
-            else -> false
-        }
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -149,7 +150,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
             val textWidth: Int = bounds.width()
             val textHeight: Int = bounds.height()
             canvas.drawText(
-                grid[row][column],
+                this.grid[row][column],
                 (row * cellPixel) + (cellPixel / 2) - (textWidth / 2),
                 (column * cellPixel) + (cellPixel / 2) + (textHeight / 2),
                 cellText
