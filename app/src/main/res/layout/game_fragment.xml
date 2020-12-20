@@ -2,36 +2,25 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="10dp"
-            android:gravity="center"
-            android:layout_weight="1"
-            android:orientation="vertical"
             tools:context="com.boardGame.quarantine_queen.fragments.GameFragment">
+
+        <include layout="@layout/action_bar" />
 
         <com.boardGame.quarantine_queen.views.BoardView
                 android:id="@+id/boardView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/xSmall"
+                android:layout_marginTop="?attr/actionBarSize" />
+
+        <com.boardGame.quarantine_queen.views.CountView
+                android:id="@+id/countView"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="3" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/boardView" />
 
-        <LinearLayout
-                android:id="@+id/layout"
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:orientation="vertical">
-
-
-            <com.boardGame.quarantine_queen.views.CountView
-                    android:id="@+id/countView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
-        </LinearLayout>
-
-
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

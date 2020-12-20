@@ -1,10 +1,10 @@
 package com.boardGame.quarantine_queen.fragments
 
 import android.os.Bundle
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LifecycleOwner
@@ -14,17 +14,21 @@ import com.boardGame.quarantine_queen.R
 import com.boardGame.quarantine_queen.Status
 import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
+import com.boardGame.quarantine_queen.databinding.GameFragmentBinding
 import com.boardGame.quarantine_queen.listeners.QueenListener
+import com.boardGame.quarantine_queen.utils.ThemeUtils
+import com.boardGame.quarantine_queen.utils.getAlternateTheme
 import com.boardGame.quarantine_queen.viewModel.Game
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.action_bar.view.*
+import kotlinx.android.synthetic.main.game_fragment.*
 import java.util.*
 import kotlin.collections.ArrayList
 
 class GameFragment : Fragment(), QueenListener {
 
-
     private val viewModel by activityViewModels<GameLevelViewModel>()
+    private lateinit var binding: GameFragmentBinding
     private lateinit var game: Game
     private lateinit var selectedSolutionDetail: ProgressDetail
     private lateinit var solutionList: ArrayList<ProgressDetail>
@@ -36,11 +40,25 @@ class GameFragment : Fragment(), QueenListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val updatedInflater = inflater.cloneInContext(ContextThemeWrapper(activity,R.style.DarkTheme))
-        return updatedInflater.inflate(R.layout.game_fragment, container, false)
+
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.game_fragment, container, false
+        )
+        val view = binding.root;
+        val toolbar: Toolbar = view.toolBar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        toolbar.title = ""
+        toolbar.setNavigationIcon(R.drawable.ic_baseline_arrow_back_24)
+        setHasOptionsMenu(true)
+        toolbar.setNavigationOnClickListener {
+            activity?.onBackPressed()
+        }
+        return view
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+
         super.onViewCreated(view, savedInstanceState)
         boardView.registerListener(this)
         game = viewModel.game
@@ -96,6 +114,40 @@ class GameFragment : Fragment(), QueenListener {
             })
 
 
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        println("onOptionsItemSelected $item");
+        return when (item?.itemId) {
+            R.id.theme -> {
+                ThemeUtils.setCurrentTheme(
+                    requireActivity(),
+                    getAlternateTheme(ThemeUtils.getCurrentTheme(requireActivity())),
+                    true
+                )
+                true
+            }
+            else -> {
+                true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        var themeIcon = menu?.findItem(R.id.theme)
+
+        if (ThemeUtils.getCurrentTheme(requireActivity()) == R.style.LightTheme) {
+            themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
+        } else {
+            themeIcon?.setIcon(R.drawable.ic_twotone_wb_sunny_24)
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu, inflater)
     }
 
 

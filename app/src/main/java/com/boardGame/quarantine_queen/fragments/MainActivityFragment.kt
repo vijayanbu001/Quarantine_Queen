@@ -1,10 +1,11 @@
 package com.boardGame.quarantine_queen.fragments
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -16,32 +17,64 @@ import com.boardGame.quarantine_queen.R
 import com.boardGame.quarantine_queen.adapters.GameBoardAdapter
 import com.boardGame.quarantine_queen.database.entity.GridDetail
 import com.boardGame.quarantine_queen.databinding.MainActivityFragmentBinding
+import com.boardGame.quarantine_queen.utils.getAlternateTheme
+import com.boardGame.quarantine_queen.utils.getCurrentTheme
+import com.boardGame.quarantine_queen.utils.setCurrentTheme
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
+import kotlinx.android.synthetic.main.action_bar.view.*
 import java.lang.Math.abs
 
 
 class MainActivityFragment : Fragment() {
+    private var themeId: Int = 0;
 
     private val viewModel by activityViewModels<GameLevelViewModel>()
     private lateinit var binding: MainActivityFragmentBinding
     private lateinit var viewpager: ViewPager2
     private lateinit var imageList: List<Pair<Int, Int>>
+    private lateinit var viewGroup: ViewGroup
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        themeId = getCurrentTheme(requireActivity(), R.style.LightTheme)
+        setCurrentTheme(requireActivity(), themeId)
         super.onCreate(savedInstanceState)
     }
+
+    override fun onAttach(context: Context) {
+        context.theme.applyStyle(themeId, true); //blue ripple color
+        super.onAttach(context)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         viewModel.gridDetails.observe(viewLifecycleOwner, Observer {
             println("grid details $it")
             setViewPager(it)
         })
 
+        val updatedInflater =
+            inflater.cloneInContext(ContextThemeWrapper(activity, themeId))
+
+        container.let {
+            if (it != null) {
+                viewGroup = it
+            }
+        }
         binding =
-            DataBindingUtil.inflate(inflater, R.layout.main_activity_fragment, container, false)
-        return binding.root
+            DataBindingUtil.inflate(
+                updatedInflater,
+                R.layout.main_activity_fragment,
+                container,
+                false
+            )
+
+        val view = binding.root
+        val toolbar: Toolbar = view.toolBar
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        setHasOptionsMenu(true)
+        return view
     }
 
 
@@ -57,6 +90,41 @@ class MainActivityFragment : Fragment() {
                 bundle
             )
         }
+    }
+
+    private fun setTheme(resId: Int) {
+        themeId = resId;
+        setCurrentTheme(requireActivity(), themeId, true)
+    }
+
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        println("onOptionsItemSelected $item");
+        return when (item?.itemId) {
+            R.id.theme -> {
+                setTheme(getAlternateTheme(themeId))
+                true
+            }
+            else -> {
+                true
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        var themeIcon = menu?.findItem(R.id.theme)
+        if (themeId == R.style.LightTheme) {
+            themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
+        } else {
+            themeIcon?.setIcon(R.drawable.ic_twotone_wb_sunny_24)
+        }
+        super.onPrepareOptionsMenu(menu)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+        return super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun setViewPager(it: List<GridDetail>) {
@@ -91,6 +159,6 @@ class MainActivityFragment : Fragment() {
     private fun getImageList(it: List<GridDetail>): List<Pair<Int, Int>> {
         val imageIdMap: LinkedHashMap<Int, Int> = LinkedHashMap()
         it.forEach { gridDetail -> imageIdMap[gridDetail.qCount] = R.mipmap.ic_launcher }
-       return imageIdMap.toList()
+        return imageIdMap.toList()
     }
 }

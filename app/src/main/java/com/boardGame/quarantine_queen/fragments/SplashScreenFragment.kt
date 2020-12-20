@@ -2,6 +2,7 @@ package com.boardGame.quarantine_queen.fragments
 
 import TrackBot
 import android.os.Bundle
+import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -32,7 +33,10 @@ class SplashScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         viewModel.gridDetails.observe(viewLifecycleOwner, Observer { updateGameBoardSizeLimit(it) })
-        return inflater.inflate(R.layout.fragment_splash_screen, container, false)
+        val updatedInflater =
+            inflater.cloneInContext(ContextThemeWrapper(activity, R.style.SplashTheme))
+
+        return updatedInflater.inflate(R.layout.fragment_splash_screen, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
