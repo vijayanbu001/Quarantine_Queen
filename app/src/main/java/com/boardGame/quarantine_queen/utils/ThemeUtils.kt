@@ -1,6 +1,7 @@
 package com.boardGame.quarantine_queen.utils
 
 import android.app.Activity
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import com.boardGame.quarantine_queen.R
 
@@ -27,4 +28,15 @@ object ThemeUtils {
         return currentTheme
     }
 
+    fun getOnBackgroundColor(): Int {
+        return currentTheme
+    }
+
+    fun getBackgroundColor(): Int {
+        if (currentTheme == R.style.DarkTheme) {
+            return Color.LTGRAY
+        } else {
+            return Color.WHITE
+        }
+    }
 }

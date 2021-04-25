@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import com.boardGame.quarantine_queen.utils.GridColor
+import com.boardGame.quarantine_queen.utils.ThemeUtils.getBackgroundColor
 import com.boardGame.quarantine_queen.utils.drawCellWithDimension
 
 
@@ -16,13 +18,13 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
     private var cellPixel: Float = 0F
 
     private val gridLine = Paint().apply {
-        color = Color.BLACK
+        color = getBackgroundColor()
         strokeWidth = 2f
         isAntiAlias = true
-        style = Paint.Style.STROKE
+        style = Paint.Style.FILL_AND_STROKE
     }
     private val cellText = Paint().apply {
-        color = Color.BLUE
+        color = Color.RED
         strokeWidth = 3f
         textSize = 50f
         isAntiAlias = true
@@ -53,17 +55,26 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun drawGrid(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0, 0, gridLine, width.toFloat(), cellPixel)
+        drawCellWithDimension(canvas, 0, 0, GridColor.GRID_FILL.paint, width.toFloat(), cellPixel)
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {
         val text = if (availableQueenList.size > column) availableQueenList[column] else ""
-        canvas.drawRect(
-            column * cellPixel,
-            row * cellPixel,
+        drawCellWithDimension(
+            canvas,
+            column,
+            row,
+            gridLine,
             (column + 1) * cellPixel,
-            (row + 1) * cellPixel, gridLine
+            (row + 1) * cellPixel
         )
+
+//        canvas.drawRect(
+//            column * cellPixel,
+//            row * cellPixel,
+//            (column + 1) * cellPixel,
+//            (row + 1) * cellPixel, gridLine
+//        )
         with(canvas) {
             drawText(
                 text,
