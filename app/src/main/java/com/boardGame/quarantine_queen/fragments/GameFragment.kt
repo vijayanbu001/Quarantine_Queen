@@ -1,7 +1,10 @@
 package com.boardGame.quarantine_queen.fragments
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.DataBindingUtil
@@ -116,7 +119,7 @@ class GameFragment : Fragment(), QueenListener {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         println("onOptionsItemSelected $item");
-         return when (item?.itemId) {
+        return when (item?.itemId) {
             R.id.theme -> {
                 ThemeUtils.setCurrentTheme(
                     requireActivity(),
@@ -127,62 +130,11 @@ class GameFragment : Fragment(), QueenListener {
                 true
             }
             else -> {
-                true 
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        var themeIcon = menu?.findItem(R.id.theme)
-
-        if (ThemeUtils.getCurrentTheme(requireActivity()) == R.style.LightTheme) {
-            themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
-        } else {
-            themeIcon?.setIcon(R.drawable.ic_twotone_wb_sunny_24)
-        }
-        super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        return super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        println("onOptionsItemSelected $item");
-        return when (item?.itemId) {
-            R.id.theme -> {
-                ThemeUtils.setCurrentTheme(
-                    requireActivity(),
-                    getAlternateTheme(ThemeUtils.getCurrentTheme(requireActivity())),
-                    true
-                )
-                true
-            }
-            else -> {
                 true
             }
         }
         return super.onOptionsItemSelected(item)
     }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        var themeIcon = menu?.findItem(R.id.theme)
-
-        if (ThemeUtils.getCurrentTheme(requireActivity()) == R.style.LightTheme) {
-            themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
-        } else {
-            themeIcon?.setIcon(R.drawable.ic_twotone_wb_sunny_24)
-        }
-        super.onPrepareOptionsMenu(menu)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-        return super.onCreateOptionsMenu(menu, inflater)
-    }
-
 
     private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
         observe(lifecycleOwner, object : Observer<T> {
