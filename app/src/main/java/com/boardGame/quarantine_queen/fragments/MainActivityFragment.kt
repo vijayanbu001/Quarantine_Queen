@@ -54,9 +54,17 @@ class MainActivityFragment : Fragment() {
             setViewPager(it)
         })
 
+        val updatedInflater =
+            inflater.cloneInContext(ContextThemeWrapper(activity, themeId))
+
+        container.let {
+            if (it != null) {
+                viewGroup = it
+            }
+        }
         binding =
             DataBindingUtil.inflate(
-                inflater,
+                updatedInflater,
                 R.layout.main_activity_fragment,
                 container,
                 false
@@ -126,6 +134,7 @@ class MainActivityFragment : Fragment() {
         viewpager.offscreenPageLimit = 3
         viewpager.clipToPadding = false
         viewpager.clipChildren = false
+
 
         val pageMargin = resources.getDimension(R.dimen.pageMargin)
         val pageOffset = resources.getDimension(R.dimen.pagerOffset)
