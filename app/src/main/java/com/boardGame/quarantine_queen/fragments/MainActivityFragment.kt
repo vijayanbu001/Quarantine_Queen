@@ -85,6 +85,7 @@ class MainActivityFragment : Fragment() {
             val bundle = Bundle()
             val selectedGridSize = imageList[viewpager.currentItem].first
             bundle.putInt("gridSize", selectedGridSize)
+            viewModel.setGridSize(selectedGridSize)
             findNavController().navigate(
                 R.id.action_mainActivityFragment_to_gameLevelFragment,
                 bundle
@@ -158,7 +159,7 @@ class MainActivityFragment : Fragment() {
 
     private fun getImageList(it: List<GridDetail>): List<Pair<Int, Int>> {
         val imageIdMap: LinkedHashMap<Int, Int> = LinkedHashMap()
-        it.forEach { gridDetail -> imageIdMap[gridDetail.qCount] = R.mipmap.ic_launcher }
+        it.forEach { gridDetail -> imageIdMap[gridDetail.qCount] = R.mipmap.ic_launcher_round }
         return imageIdMap.toList()
     }
 }

@@ -1,8 +1,9 @@
 package com.boardGame.quarantine_queen.viewModel
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 
-class GameViewModel : ViewModel() {
-    var game: Game = Game()
+class GameViewModel(application: Application) : AndroidViewModel(application) {
+    var game: Game = Game(application)
 
 }

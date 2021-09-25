@@ -1,11 +1,12 @@
 package com.boardGame.quarantine_queen.viewModel
 
+import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 
-class BoardViewModel : ViewModel() {
+class BoardViewModel(application: Application) : AndroidViewModel(application) {
 
-    var game: Game = Game()
+    var game: Game = Game(application)
 
     init {
         Log.i("BoardViewModel", "BoardViewModel created!")

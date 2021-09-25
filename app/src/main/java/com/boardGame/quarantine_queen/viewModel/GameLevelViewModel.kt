@@ -11,32 +11,55 @@ import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
 import com.boardGame.quarantine_queen.repository.QueenRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class GameLevelViewModel(application: Application) : AndroidViewModel(application) {
     private val repository: QueenRepository
     var gridDetails: LiveData<List<GridDetail>>
-    var gridSolutionDetails: MutableLiveData<List<GridSolutionDetail>> =
-        MutableLiveData()
-    lateinit var progressDetailBySize: LiveData<List<ProgressDetail>>
+    lateinit var gridSolutionDetails: LiveData<List<GridSolutionDetail>>
+    var gridSize = MutableLiveData<Int>(4)
+
+    //    lateinit var progressDetailBySize: LiveData<List<ProgressDetail>>
+    lateinit var progressDetailBySizePosition: LiveData<ProgressDetail>
     lateinit var gridSolutionDetailBySize: LiveData<List<GridSolutionDetail>>
-    var game: Game = Game()
 
     init {
         val dao = QueenDatabase.getDatabase(application).dao()
         repository = QueenRepository(dao)
         gridDetails = repository.getAllGridDetails
-        viewModelScope.launch {
+        /*viewModelScope.launch {
             repository.getGridSolutionDetails.collect {
                 gridSolutionDetails.value = it
             }
-        }
+        }*/
+
+
     }
 
-    fun fetchGridDetailBySize(gridSize: Int) {
+    fun setGridSize(size: Int) {
+        gridSize.value = size
+        gridSolutionDetails = repository.getGridSolutionDetailBySize(size)
+    }
+
+    fun fetchGridDetailBySize(gridSize: Int, position: Int) {
         gridSolutionDetailBySize = repository.getGridSolutionDetailBySize(gridSize)
-        progressDetailBySize = repository.getProgressDetailsBySize(gridSize)
+//        progressDetailBySize =repository.getProgressDetailsBySize(gridSize)
+
+
+        /*  val progressDetail = ProgressDetail("0", 4)
+          val userSolution = ArrayList<String>()
+          userSolution.add("0_1")
+          progressDetail.userSolutionList = userSolution
+          val list = ArrayList<ProgressDetail>()
+          list.add(progressDetail)
+          progressDetailBySize = list as LiveData<List<ProgressDetail>>
+
+          progressDetailBySizePosition =
+              Transformations.map(progressDetailBySize) { progressDetails ->
+                  progressDetails.filterIndexed { index, _ -> index == position }.first()
+              }*/
+
+//        Transformations.map(progressDetailBySizePosition) { progressDetail -> progressDetail.userSolutionList }
     }
 
     fun initializeData(
@@ -77,7 +100,7 @@ class GameLevelViewModel(application: Application) : AndroidViewModel(applicatio
 
     fun setProgressList(userSolutionList: ArrayList<String>?) = userSolutionList?.let {
         println("setting progress list $it")
-        game.progressList.value = it
+//        game.progressList.value = it
     }
 
     fun updateStatus(gridSolutionDetail: GridSolutionDetail) {

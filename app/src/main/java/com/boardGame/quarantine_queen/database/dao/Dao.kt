@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 interface Dao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAllGridDetails(gridDetails: List<GridDetail>)
+    fun insertAllGridDetails(gridDetails: List<GridDetail>)
 
     @Query("SELECT * FROM GridDetail")
     fun getAllGridDetails(): LiveData<List<GridDetail>>
@@ -21,12 +21,12 @@ interface Dao {
     suspend fun getSelectedGridDetail(qCount: Int): List<GridDetail>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertAllGridSolutionDetails(gridSolutionDetail: List<GridSolutionDetail>)
+    fun insertAllGridSolutionDetails(gridSolutionDetail: List<GridSolutionDetail>)
 
     @Query("SELECT * FROM GridSolutionDetail order by size asc, status desc")
     fun getAllGridSolutionDetails(): Flow<List<GridSolutionDetail>>
 
-    @Query("SELECT * FROM GridSolutionDetail where size= :size order by status_Order")
+    @Query("SELECT * FROM GridSolutionDetail where size= :size order by status DESC,status_Order")
     fun getGridSolutionDetailsBySize(size: Int): LiveData<List<GridSolutionDetail>>
 
     // need to add update query for status
@@ -37,7 +37,7 @@ interface Dao {
 //    suspend fun updateProgressDetails(progressDetails: List<ProgressDetail>)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertProgressDetails(progressDetails: List<ProgressDetail>)
+    fun insertProgressDetails(progressDetails: List<ProgressDetail>)
 
     @Query("SELECT * FROM ProgressDetail where size= :size")
     fun getProgressDetailsBySize(size: Int): LiveData<List<ProgressDetail>>
