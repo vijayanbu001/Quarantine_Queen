@@ -1,4 +1,4 @@
- package com.boardGame.quarantine_queen.fragments
+package com.boardGame.quarantine_queen.fragments
 
 import android.os.Bundle
 import android.view.*
@@ -19,6 +19,7 @@ import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.databinding.GameLevelFragmentBinding
 import com.boardGame.quarantine_queen.utils.ThemeUtils
 import com.boardGame.quarantine_queen.utils.getAlternateTheme
+import com.boardGame.quarantine_queen.viewModel.BoardViewModel
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
 import kotlinx.android.synthetic.main.action_bar.view.*
 import kotlinx.android.synthetic.main.game_level_fragment.view.*
@@ -27,13 +28,13 @@ import kotlin.properties.Delegates
 
 class GameLevelFragment : Fragment() {
     private val viewModel by activityViewModels<GameLevelViewModel>()
+    private val boardViewModel by activityViewModels<BoardViewModel>()
     private lateinit var binding: GameLevelFragmentBinding
     private lateinit var gridView: GridView
     private lateinit var levelList: List<Pair<Int, Int>>
     private var gridSize by Delegates.notNull<Int>()
     private var progressIndex = -1
     private var isProgress = false
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -110,12 +111,15 @@ class GameLevelFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val navController: NavController = view.findNavController()
         view.game_level_grid.setOnItemClickListener { _: AdapterView<*>, _: View, position: Int, _: Long ->
+//            boardViewModel.game.updateBoardSize(gridSize)
             println("position ==> $position,$progressIndex")
             if (progressIndex == -1 || position <= progressIndex) {
                 val bundle = Bundle()
                 bundle.putInt("gridSize", gridSize)
                 bundle.putInt("position", position)
-                viewModel.fetchGridDetailBySize(gridSize)
+
+//                viewModel.fetchGridDetailBySize(gridSize, position)
+                boardViewModel.game.fetchGridDetailBySize(gridSize)
                 navController.navigate(R.id.action_gameLevelFragment_to_gameFragment, bundle)
             }
         }
@@ -126,21 +130,18 @@ class GameLevelFragment : Fragment() {
         gridSolutionDetails: List<GridSolutionDetail>
     ): List<Pair<Int, Int>> {
         val imageIdMap: LinkedHashMap<Int, Int> = LinkedHashMap()
-        if (gridSolutionDetails.isNotEmpty()) {
-            gridSolutionDetails.filter { gridSolutionDetail -> gridSolutionDetail.size == gridSize }
-                .forEachIndexed { index, filteredGridSolutionDetail ->
-                    if (filteredGridSolutionDetail.status == Status.PROGRESS.value || (filteredGridSolutionDetail.status == Status.START.value && !isProgress)) {
-                        progressIndex = index
-                        isProgress = true
-                        imageIdMap[index] = R.drawable.ic_launcher_foreground
-                    } else if (filteredGridSolutionDetail.status == Status.COMPLETED.value) {
-                        imageIdMap[index] = R.mipmap.ic_launcher
-                    } else {
-                        imageIdMap[index] = R.drawable.ic_launcher_background
-                    }
-                }
-            isProgress = false
+        gridSolutionDetails?.forEachIndexed { index, filteredGridSolutionDetail ->
+            if (filteredGridSolutionDetail.status == Status.PROGRESS.value || (filteredGridSolutionDetail.status == Status.START.value && !isProgress)) {
+                progressIndex = index
+                isProgress = true
+                imageIdMap[index] = R.drawable.ic_play_foreground
+            } else if (filteredGridSolutionDetail.status == Status.COMPLETED.value) {
+                imageIdMap[index] = R.drawable.ic_complete_foreground
+            } else {
+                imageIdMap[index] = R.drawable.ic_lock_foreground
+            }
         }
+        isProgress = false
         return imageIdMap.toList()
     }
 

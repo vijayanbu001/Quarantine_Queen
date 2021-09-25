@@ -6,23 +6,20 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import com.boardGame.quarantine_queen.utils.GridColor
-import com.boardGame.quarantine_queen.utils.ThemeUtils.getBackgroundColor
+import com.boardGame.quarantine_queen.model.Cell
+import com.boardGame.quarantine_queen.utils.GridTheme
+import com.boardGame.quarantine_queen.utils.GridTheme.BACK_GROUND
 import com.boardGame.quarantine_queen.utils.drawCellWithDimension
-
+import java.util.*
 
 class CountView(context: Context?, attributeSet: AttributeSet) : View(context, attributeSet) {
 
     private var count: Int = 4
-    private var availableQueenList: ArrayList<String> = ArrayList()
+    private var availableQueenStack: Stack<Cell>? = null
     private var cellPixel: Float = 0F
+    private val queenText = "Q"
 
-    private val gridLine = Paint().apply {
-        color = getBackgroundColor()
-        strokeWidth = 2f
-        isAntiAlias = true
-        style = Paint.Style.FILL_AND_STROKE
-    }
+
     private val cellText = Paint().apply {
         color = Color.RED
         strokeWidth = 3f
@@ -35,62 +32,68 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val widthPixels = MeasureSpec.getSize(widthMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
-        cellPixel = widthPixels.toFloat() / count
-        val newHeightSpec = MeasureSpec.makeMeasureSpec(cellPixel.toInt(), widthMode)
+        val actualCellPixel = widthPixels.toFloat() / count
+        cellPixel = (widthPixels.toFloat() / count).minus(1f)
+        val newHeightSpec = MeasureSpec.makeMeasureSpec(actualCellPixel.toInt(), widthMode)
         setMeasuredDimension(widthMeasureSpec, newHeightSpec)
         super.onMeasure(widthMeasureSpec, newHeightSpec)
     }
 
     override fun onDraw(canvas: Canvas) {
-        fillGridCell(canvas)
         drawGrid(canvas)
-//        canvas.drawRect(0f, 0f, width.toFloat(), cellPixel, gridLine)
+        fillGridCell(canvas)
+        drawGridBorder(canvas)
     }
 
     private fun fillGridCell(canvas: Canvas) {
-        val row = 0
-        for (col in 0 until count) {
-            placeQueen(canvas, row, col)
+        val col = 0
+        for (row in 0 until count) {
+            drawCell(canvas, row, col, GridTheme.BLANK_CELL.paint)
+            if (!availableQueenStack.isNullOrEmpty() && availableQueenStack?.size!! > row && availableQueenStack?.get(row)
+                    ?.hasQueen() == true
+            ) {
+                placeQueen(canvas, row, col)
+            }
         }
     }
 
+    private fun drawCell(canvas: Canvas, row: Int, col: Int, paint: Paint) {
+        drawCellWithDimension(
+            canvas,
+            row * 1f,
+            col * 1f,
+            paint,
+            cellPixel,
+            cellPixel
+        )
+    }
+
     private fun drawGrid(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0, 0, GridColor.GRID_FILL.paint, width.toFloat(), cellPixel)
+        drawCellWithDimension(canvas, 0f, 0f, BACK_GROUND.paint, width.toFloat(), cellPixel)
+    }
+
+    private fun drawGridBorder(canvas: Canvas) {
+        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel)
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {
-        val text = if (availableQueenList.size > column) availableQueenList[column] else ""
-        drawCellWithDimension(
-            canvas,
-            column,
-            row,
-            gridLine,
-            (column + 1) * cellPixel,
-            (row + 1) * cellPixel
-        )
-
-//        canvas.drawRect(
-//            column * cellPixel,
-//            row * cellPixel,
-//            (column + 1) * cellPixel,
-//            (row + 1) * cellPixel, gridLine
-//        )
         with(canvas) {
             drawText(
-                text,
-                (column * cellPixel) + (cellPixel / 2) - 20f,
-                (row * cellPixel) + (cellPixel / 2) + 15f,
+                queenText,
+                (row * cellPixel) + (cellPixel / 2) - 20f,
+                (column * cellPixel) + (cellPixel / 2) + 15f,
                 cellText
             )
         }
     }
 
-    fun updateQueenGrid(availableQueenList: ArrayList<String>) {
-        this.availableQueenList = availableQueenList
+    fun updateQueenGrid(availableQueenStack: Stack<Cell>) {
+        this.availableQueenStack = availableQueenStack
         invalidate()
     }
 
     fun updateBoardSize(size: Int) {
         count = size
+//        invalidate()
     }
 }

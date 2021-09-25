@@ -33,10 +33,10 @@ object ThemeUtils {
     }
 
     fun getBackgroundColor(): Int {
-        if (currentTheme == R.style.DarkTheme) {
-            return Color.LTGRAY
+        return if (currentTheme == R.style.DarkTheme) {
+            Color.LTGRAY
         } else {
-            return Color.WHITE
+            Color.WHITE
         }
     }
 }

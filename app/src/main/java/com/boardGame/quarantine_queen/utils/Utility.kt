@@ -47,26 +47,27 @@ fun <T> Array<out T>.toStringList(): List<String> {
 
 fun drawCellWithDimension(
     canvas: Canvas,
-    left: Int,
-    top: Int,
+    left: Float,
+    top: Float,
     paint: Paint,
     width: Float,
     height: Float
 ) {
+    val space = 5f
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
         canvas.drawRoundRect(
-            (left * width) + 5f,
-            (top * height) + 5f,
-            (left + 1) * width - 5f,
-            (top + 1) * height - 5f,
+            (left * width) + space,
+            (top * height) + space,
+            (left + 1) * width - space,
+            (top + 1) * height - space,
             (100 / 4f), 100 / 4f, paint
         )
     } else {
         canvas.drawRect(
-            (left * width) + 5f,
-            (top * height) + 5f,
-            (left + 1) * width,
-            (top + 1) * height,
+            (left * width) + space,
+            (top * height) + space,
+            (left + 1) * width - space,
+            (top + 1) * height - space,
             paint
         )
     }

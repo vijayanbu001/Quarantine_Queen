@@ -15,9 +15,11 @@ import com.boardGame.quarantine_queen.Status
 import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
 import com.boardGame.quarantine_queen.databinding.GameFragmentBinding
-import com.boardGame.quarantine_queen.listeners.QueenListener
+import com.boardGame.quarantine_queen.listeners.BoardListener
+import com.boardGame.quarantine_queen.model.Cell
 import com.boardGame.quarantine_queen.utils.ThemeUtils
 import com.boardGame.quarantine_queen.utils.getAlternateTheme
+import com.boardGame.quarantine_queen.viewModel.BoardViewModel
 import com.boardGame.quarantine_queen.viewModel.Game
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
 import kotlinx.android.synthetic.main.action_bar.view.*
@@ -25,27 +27,39 @@ import kotlinx.android.synthetic.main.game_fragment.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class GameFragment : Fragment(), QueenListener {
+class GameFragment : Fragment(), BoardListener {
 
-    private val viewModel by activityViewModels<GameLevelViewModel>()
+    private val gameLevelViewModel by activityViewModels<GameLevelViewModel>()
+    private val boardViewModel by activityViewModels<BoardViewModel>()
     private lateinit var binding: GameFragmentBinding
     private lateinit var game: Game
     private lateinit var selectedSolutionDetail: ProgressDetail
     private lateinit var solutionList: ArrayList<ProgressDetail>
     private var existingSolutionList: ArrayList<GridSolutionDetail> =
-        ArrayList<GridSolutionDetail>()
+        ArrayList()
     private val dialog = GameOverDialogFragment()
+    private lateinit var args: GameFragmentArgs
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        println("i am in GameFragment onCreate")
+        game = boardViewModel.game
+        args = GameFragmentArgs.fromBundle(
+            requireArguments()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-
+    ): View {
+        println("i am in GameFragment onCreateView")
         binding = DataBindingUtil.inflate(
             inflater,
             R.layout.game_fragment, container, false
         )
-        val view = binding.root;
+        val view = binding.root
         val toolbar: Toolbar = view.toolBar
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
         toolbar.title = ""
@@ -57,84 +71,79 @@ class GameFragment : Fragment(), QueenListener {
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
-        super.onViewCreated(view, savedInstanceState)
-        boardView.registerListener(this)
-        game = viewModel.game
-        val args = GameFragmentArgs.fromBundle(
-            requireArguments()
-        )
-        updateBoardSize(args.gridSize)
-        viewModel.progressDetailBySize.observeOnce(viewLifecycleOwner, Observer { optionalProgressDetails ->
-            optionalProgressDetails?.let { progressDetails ->
-                solutionList = progressDetails as ArrayList<ProgressDetail>
-                println("fetched grid details $progressDetails, ${args.position}")
-                selectedSolutionDetail = progressDetails[args.position]
-                if (selectedSolutionDetail.userSolutionList?.isNotEmpty()!!) {
-                    viewModel.setProgressList(selectedSolutionDetail.userSolutionList)
-                    println("fetched grid details $selectedSolutionDetail")
-                    selectedSolutionDetail.userSolutionList?.forEachIndexed { index, item ->
-                        selectCell(
-                            item.toInt(),
-                            index,
-                            false
-                        )
-                    }
-
-                    if (selectedSolutionDetail.status == Status.COMPLETED.value) {
-                        boardView.setReadonly()
-                    }
-                }
-                game.selectedCellLiveData.observe(
-                    viewLifecycleOwner,
-                    Observer { updateSelectedUI(it) })
-                game.availableQueens.observe(
-                    viewLifecycleOwner,
-                    Observer { updateMappedQueenUI(it) })
-                game.grid.observe(viewLifecycleOwner, Observer { updateGridCellsUI(it) })
-                game.conflictLiveMap.observe(
-                    viewLifecycleOwner,
-                    Observer { updateConflictCellUI(it) })
-                game.countGridLiveData.observe(
-                    viewLifecycleOwner,
-                    Observer { updateAvailableQueenGrid(it) })
-                var count = 0
-                game.progressList.observe(viewLifecycleOwner, Observer {
-                    println("updating user solution ${count++} ")
-                    updateUserSolution(it, args.gridSize)
-                })
+    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
+        observe(lifecycleOwner, object : Observer<T> {
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
             }
         })
+    }
 
-        viewModel.gridSolutionDetailBySize.observeOnce(
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        println("i am in GameFragment onViewCreated")
+        super.onViewCreated(view, savedInstanceState)
+        boardView.registerListener(this)
+//        game = gameLevelViewModel.game
+        /*  args = GameFragmentArgs.fromBundle(
+              requireArguments()
+          )*/
+        game.progressDetailBySize.observeOnce(
             viewLifecycleOwner,
-            Observer { gridSolutionDetails ->
-                existingSolutionList = gridSolutionDetails as ArrayList<GridSolutionDetail>
+            Observer { optionalProgressDetails ->
+                optionalProgressDetails?.let { progressDetails ->
+
+                    game.loadBoard(args.position, progressDetails)
+
+
+                }
             })
+        game.gridLiveData.observe(
+            viewLifecycleOwner,
+            Observer { grid -> updateGridCellsUI(grid) })
+        game.queenStackLiveData.observe(
+            viewLifecycleOwner,
+            Observer { queenStack -> updateAvailableQueenGrid(queenStack) })
+        game.gameOverLiveData.observe(
+            viewLifecycleOwner,
+            Observer { gameOver ->
+                if (gameOver == true) {
+                    showGameOverModal(gameOver)
+                }
+            })
+     /*   game.gridSolutionDetailBySize.observe(viewLifecycleOwner, Observer { solutionDetail ->
+            println("solutionDetail $solutionDetail")
+        })*/
+    }
+
+    private fun showGameOverModal(gameOver: Boolean?) {
+        dialog.show(
+            requireActivity().supportFragmentManager,
+            "GameOverDialogFragment"
+        )
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        println("onOptionsItemSelected $item");
-         return when (item?.itemId) {
+        return when (item.itemId) {
             R.id.theme -> {
                 ThemeUtils.setCurrentTheme(
                     requireActivity(),
                     getAlternateTheme(ThemeUtils.getCurrentTheme(requireActivity())),
                     true
                 )
-//                boardView.invalidate()
                 true
             }
             else -> {
                 true
             }
         }
-        return super.onOptionsItemSelected(item)
+
+
+//        return super.onOptionsItemSelected(item)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        var themeIcon = menu?.findItem(R.id.theme)
+        var themeIcon = menu.findItem(R.id.theme)
 
         if (ThemeUtils.getCurrentTheme(requireActivity()) == R.style.LightTheme) {
             themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
@@ -149,15 +158,6 @@ class GameFragment : Fragment(), QueenListener {
         return super.onCreateOptionsMenu(menu, inflater)
     }
 
-
-    private fun <T> LiveData<T>.observeOnce(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
-        observe(lifecycleOwner, object : Observer<T> {
-            override fun onChanged(t: T?) {
-                observer.onChanged(t)
-                removeObserver(this)
-            }
-        })
-    }
 
     private fun updateUserSolution(progressList: ArrayList<String>?, size: Int) =
         progressList?.let {
@@ -174,61 +174,27 @@ class GameFragment : Fragment(), QueenListener {
                     else -> selectedSolutionDetail.status
                 }
             }
-            viewModel.updateUserSolution(progressDetail)
+            gameLevelViewModel.updateUserSolution(progressDetail)
         }
 
-    private fun updateBoardSize(size: Int) {
-        game.updateBoardSize(size)
-        boardView.updateBoardSize(size)
-        countView.updateBoardSize(size)
-    }
-
-    private fun updateAvailableQueenGrid(availableQueenGrid: ArrayList<String>?) =
-        availableQueenGrid?.let {
-            countView.updateQueenGrid(availableQueenGrid)
-            println("observer1")
+    private fun updateAvailableQueenGrid(availableQueen: Stack<Cell>) =
+        availableQueen?.let {
+            countView.updateBoardSize(args.gridSize)
+            countView.updateQueenGrid(availableQueen)
+            println("count view updateAvailableQueenGrid")
         }
 
-    private fun updateConflictCellUI(conflictMap: HashMap<String, ArrayList<String>>?) =
-        conflictMap?.let {
-            boardView.updateConflictMap(conflictMap)
-            println("observer2 ${it.size}")
 
-        }
-
-    private fun updateMappedQueenUI(value: Int?) = value?.let {
-        boardView.updateQueenCount(value)
-        println("observer3")
-    }
-
-    private fun updateGridCellsUI(grid: Array<Array<String>>?) = grid?.let {
-        boardView.updateGrid(grid)
+    private fun updateGridCellsUI(grid: Array<Array<Cell>>) {
         println("observer4")
+        boardView.updateBoardSize(grid.size)
+        boardView.updateGrid(grid)
     }
 
-    private fun updateSelectedUI(cell: Pair<Int, Int>?) = cell?.let {
-        boardView.addSelectedCell(cell.first, cell.second)
-        println("observer5")
-    }
-
-    override fun change(value: Int) {
-        println("change function")
-        game.updateAvailableQueenCount(value)
-    }
 
     override fun selectCell(row: Int, col: Int, userAction: Boolean) {
         println("selectCell function")
         game.updateSelectedCell(row, col, userAction)
-    }
-
-    override fun gridUpdate(grid: Array<Array<String>>) {
-        println("gridUpdate function")
-        game.updateGrid(grid)
-    }
-
-    override fun conflictUpdate(row: Int, column: Int, operation: Int) {
-        println("conflictUpdate function")
-        game.updateConflictMap(row, column, operation)
     }
 
     private fun gameOver(progressList: ArrayList<String>): Boolean {
@@ -246,7 +212,7 @@ class GameFragment : Fragment(), QueenListener {
                         gridSolutionDetail.userSolutionList = gridSolutionDetail.solutionList
                         gridSolutionDetail.status = Status.COMPLETED.value
                         println("selectedSolutionDetail $selectedSolutionDetail")
-                        viewModel.updateStatus(gridSolutionDetail)
+                        gameLevelViewModel.updateStatus(gridSolutionDetail)
                         return true
                     }
                 }

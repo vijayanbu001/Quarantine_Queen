@@ -12,10 +12,10 @@ class QueenRepository(private val dao: Dao) {
     var getGridSolutionDetails = dao.getAllGridSolutionDetails()
 
     fun getGridSolutionDetailBySize(gridSize: Int): LiveData<List<GridSolutionDetail>> {
-        return dao.getGridSolutionDetailsBySize(gridSize);
+        return dao.getGridSolutionDetailsBySize(gridSize)
     }
 
-    suspend fun insertGridSolutionDetails(gridSolutionDetails: ArrayList<GridSolutionDetail>) {
+    fun insertGridSolutionDetails(gridSolutionDetails: ArrayList<GridSolutionDetail>) {
         dao.insertAllGridSolutionDetails(gridSolutionDetails)
     }
 
@@ -23,17 +23,17 @@ class QueenRepository(private val dao: Dao) {
         dao.updateStatus(gridSolutionDetail)
     }
 
-    suspend fun insertGridDetails(gridDetails: ArrayList<GridDetail>) {
+    fun insertGridDetails(gridDetails: ArrayList<GridDetail>) {
         dao.insertAllGridDetails(gridDetails)
     }
 
-    suspend fun insertProgressDetails(progressDetails: ArrayList<ProgressDetail>) {
+    fun insertProgressDetails(progressDetails: ArrayList<ProgressDetail>) {
         dao.insertProgressDetails(progressDetails)
 
     }
 
     fun getProgressDetailsBySize(gridSize: Int): LiveData<List<ProgressDetail>> {
-        return dao.getProgressDetailsBySize(gridSize);
+        return dao.getProgressDetailsBySize(gridSize)
     }
 
     suspend fun updateProgressDetail(progressDetail: ProgressDetail) {
