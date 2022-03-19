@@ -55,7 +55,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
 
     override fun onDraw(canvas: Canvas) {
-        cellPixel = (width / count).toFloat().minus(1f)
+        cellPixel = (width / count).toFloat().minus((0.1)).toFloat()
         drawGrid(canvas)
         drawCells(canvas)
         drawGridBorder(canvas)
@@ -155,11 +155,11 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun drawCell(canvas: Canvas, row: Int, col: Int, paint: Paint) {
-        drawCellWithDimension(canvas, row * 1f, col * 1f, paint, cellPixel, cellPixel)
+        drawCellWithDimension(canvas, row * 1f, col * 1f, paint, cellPixel, cellPixel,count)
     }
 
     private fun drawGridBorder(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel)
+        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel,count)
     }
 
     private fun drawCells(canvas: Canvas) {
@@ -183,7 +183,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
             0f,
             BACK_GROUND.paint,
             width.toFloat(),
-            width.toFloat()
+            width.toFloat(),count
         )
     }
 

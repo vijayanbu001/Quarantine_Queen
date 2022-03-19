@@ -64,16 +64,16 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
             col * 1f,
             paint,
             cellPixel,
-            cellPixel
+            cellPixel,count
         )
     }
 
     private fun drawGrid(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0f, 0f, BACK_GROUND.paint, width.toFloat(), cellPixel)
+        drawCellWithDimension(canvas, 0f, 0f, BACK_GROUND.paint, width.toFloat(), cellPixel,count)
     }
 
     private fun drawGridBorder(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel)
+        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel,count)
     }
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {

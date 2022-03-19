@@ -51,7 +51,8 @@ fun drawCellWithDimension(
     top: Float,
     paint: Paint,
     width: Float,
-    height: Float
+    height: Float,
+    count:Int
 ) {
     val space = 5f
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -60,7 +61,7 @@ fun drawCellWithDimension(
             (top * height) + space,
             (left + 1) * width - space,
             (top + 1) * height - space,
-            (100 / 4f), 100 / 4f, paint
+            ((100 / count).toFloat()), (100/count).toFloat(), paint
         )
     } else {
         canvas.drawRect(
