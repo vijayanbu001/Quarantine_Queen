@@ -21,7 +21,7 @@ fun setCurrentTheme(activity: Activity, themeId: Int, recreate: Boolean = false)
     }
     activity.setTheme(themeId)
     if (recreate) {
-        activity.recreate()
+//        activity.recreate();
 //        activity.invalidateOptionsMenu()
     }
 }
@@ -54,24 +54,23 @@ fun drawCellWithDimension(
     height: Float,
     count:Int
 ) {
-    val space = 5f
+    val space = 2f
     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
         canvas.drawRoundRect(
             (left * width) + space,
             (top * height) + space,
-            (left + 1) * width - space,
-            (top + 1) * height - space,
-            ((100 / count).toFloat()), (100/count).toFloat(), paint
+            ((left + 1) * width) - space,
+            ((top + 1) * height) - space,
+            ((100 / 25).toFloat()), (100/25).toFloat(), paint
         )
     } else {
         canvas.drawRect(
             (left * width) + space,
             (top * height) + space,
-            (left + 1) * width - space,
-            (top + 1) * height - space,
+            ((left + 1) * width) - space,
+            ((top + 1) * height) - space,
             paint
         )
     }
-
 
 }

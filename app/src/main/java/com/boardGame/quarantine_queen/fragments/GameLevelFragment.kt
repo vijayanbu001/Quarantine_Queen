@@ -74,8 +74,8 @@ class GameLevelFragment : Fragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        println("onOptionsItemSelected $item");
-        return when (item?.itemId) {
+        println("onOptionsItemSelected $item")
+        return when (item.itemId) {
             R.id.theme -> {
                 ThemeUtils.setCurrentTheme(
                     requireActivity(),
@@ -92,7 +92,7 @@ class GameLevelFragment : Fragment() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        var themeIcon = menu?.findItem(R.id.theme)
+        var themeIcon = menu.findItem(R.id.theme)
 
         if (ThemeUtils.getCurrentTheme(requireActivity()) == R.style.LightTheme) {
             themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
@@ -120,6 +120,7 @@ class GameLevelFragment : Fragment() {
 
 //                viewModel.fetchGridDetailBySize(gridSize, position)
                 boardViewModel.game.fetchGridDetailBySize(gridSize)
+
                 navController.navigate(R.id.action_gameLevelFragment_to_gameFragment, bundle)
             }
         }
@@ -130,7 +131,7 @@ class GameLevelFragment : Fragment() {
         gridSolutionDetails: List<GridSolutionDetail>
     ): List<Pair<Int, Int>> {
         val imageIdMap: LinkedHashMap<Int, Int> = LinkedHashMap()
-        gridSolutionDetails?.forEachIndexed { index, filteredGridSolutionDetail ->
+        gridSolutionDetails.forEachIndexed { index, filteredGridSolutionDetail ->
             if (filteredGridSolutionDetail.status == Status.PROGRESS.value || (filteredGridSolutionDetail.status == Status.START.value && !isProgress)) {
                 progressIndex = index
                 isProgress = true

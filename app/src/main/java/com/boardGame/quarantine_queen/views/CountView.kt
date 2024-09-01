@@ -1,9 +1,8 @@
 package com.boardGame.quarantine_queen.views
 
+import android.R
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.View
 import com.boardGame.quarantine_queen.model.Cell
@@ -11,6 +10,7 @@ import com.boardGame.quarantine_queen.utils.GridTheme
 import com.boardGame.quarantine_queen.utils.GridTheme.BACK_GROUND
 import com.boardGame.quarantine_queen.utils.drawCellWithDimension
 import java.util.*
+
 
 class CountView(context: Context?, attributeSet: AttributeSet) : View(context, attributeSet) {
 
@@ -30,13 +30,20 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+
+
+
+//        val squareSize =
+//            if (widthMeasureSpec < heightMeasureSpec) widthMeasureSpec else heightMeasureSpec
+//        println("squareSize ===> ,${squareSize}")
+//        setMeasuredDimension(squareSize, squareSize)
+
         val widthPixels = MeasureSpec.getSize(widthMeasureSpec)
         val widthMode = MeasureSpec.getMode(widthMeasureSpec)
         val actualCellPixel = widthPixels.toFloat() / count
-        cellPixel = (widthPixels.toFloat() / count).minus(1f)
+        cellPixel = (actualCellPixel)
         val newHeightSpec = MeasureSpec.makeMeasureSpec(actualCellPixel.toInt(), widthMode)
         setMeasuredDimension(widthMeasureSpec, newHeightSpec)
-        super.onMeasure(widthMeasureSpec, newHeightSpec)
     }
 
     override fun onDraw(canvas: Canvas) {
@@ -78,10 +85,15 @@ class CountView(context: Context?, attributeSet: AttributeSet) : View(context, a
 
     private fun placeQueen(canvas: Canvas, row: Int, column: Int) {
         with(canvas) {
+            val bounds = Rect()
+            GridTheme.TEXT_CELL.paint.getTextBounds("Q", 0, 1, bounds)
+            val textWidth: Int = bounds.width()
+            val textHeight: Int = bounds.height()
+
             drawText(
                 queenText,
-                (row * cellPixel) + (cellPixel / 2) - 20f,
-                (column * cellPixel) + (cellPixel / 2) + 15f,
+                (row * cellPixel) + (cellPixel / 2) - (textWidth / 2),
+                (column * cellPixel) + (cellPixel / 2) + (textHeight / 2),
                 cellText
             )
         }

@@ -24,6 +24,7 @@ import com.boardGame.quarantine_queen.viewModel.Game
 import com.boardGame.quarantine_queen.viewModel.GameLevelViewModel
 import kotlinx.android.synthetic.main.action_bar.view.*
 import kotlinx.android.synthetic.main.game_fragment.*
+import kotlinx.android.synthetic.main.game_fragment.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -40,7 +41,6 @@ class GameFragment : Fragment(), BoardListener {
     private val dialog = GameOverDialogFragment()
     private lateinit var args: GameFragmentArgs
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         println("i am in GameFragment onCreate")
@@ -48,6 +48,7 @@ class GameFragment : Fragment(), BoardListener {
         args = GameFragmentArgs.fromBundle(
             requireArguments()
         )
+
     }
 
     override fun onCreateView(
@@ -68,6 +69,7 @@ class GameFragment : Fragment(), BoardListener {
         toolbar.setNavigationOnClickListener {
             activity?.onBackPressed()
         }
+
         return view
     }
 
@@ -178,7 +180,7 @@ class GameFragment : Fragment(), BoardListener {
         }
 
     private fun updateAvailableQueenGrid(availableQueen: Stack<Cell>) =
-        availableQueen?.let {
+        availableQueen.let {
             countView.updateBoardSize(args.gridSize)
             countView.updateQueenGrid(availableQueen)
             println("count view updateAvailableQueenGrid")

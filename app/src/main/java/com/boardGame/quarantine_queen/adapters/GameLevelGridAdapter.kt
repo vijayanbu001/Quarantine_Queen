@@ -23,7 +23,7 @@ class GameLevelGridAdapter(private val imageList: List<Pair<Int, Int>>) : BaseAd
     }
 
     override fun getItem(position: Int): Pair<Int, Int> {
-        return imageList.get(position)
+        return imageList[position]
     }
 
     override fun getItemId(position: Int): Long {

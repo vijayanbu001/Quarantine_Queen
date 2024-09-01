@@ -17,16 +17,16 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class Game(application: Application) {
-    var selectedCellLiveData = MutableLiveData<Pair<Int, Int>>()
+    private var selectedCellLiveData = MutableLiveData<Pair<Int, Int>>()
     var gridLiveData = MutableLiveData<Array<Array<Cell>>>()
     var queenStackLiveData = MutableLiveData<Stack<Cell>>()
     var gameOverLiveData = MutableLiveData<Boolean>(false)
-    private var boardSizeLiveData = MutableLiveData<Int>(4)
+    private var boardSizeLiveData = MutableLiveData(4)
     private lateinit var queenStack: QueenStack
     private lateinit var grid: Grid
     lateinit var progressDetailBySize: LiveData<List<ProgressDetail>>
-    lateinit var gridSolutionDetailBySize: /*LiveData<*/List<GridSolutionDetail>/*>*/
-    private var currentSolutionIndex = 0;
+    private lateinit var gridSolutionDetailBySize: /*LiveData<*/List<GridSolutionDetail>/*>*/
+    private var currentSolutionIndex = 0
     private var selectedRow = -1
     private var selectedCol = -1
     private val repository: QueenRepository
@@ -48,6 +48,7 @@ class Game(application: Application) {
 
     fun fetchGridDetailBySize(gridSize: Int) {
         progressDetailBySize = repository.getProgressDetailsBySize(gridSize)
+        println("fetching from db ${progressDetailBySize.value}")
         repository.getGridSolutionDetailBySize(gridSize)
             .observeForever { solutionDetail -> gridSolutionDetailBySize = solutionDetail }
         initialSetup(gridSize)
@@ -69,30 +70,33 @@ class Game(application: Application) {
 
     private fun updateDatabase() {
         println("i am in update database ${grid.getQueensIndex()}")
-        val updatedProgressDetail = progressDetailBySize.value?.get(currentSolutionIndex)
+        println("${progressDetailBySize.value}, $currentSolutionIndex")
 
+        if(progressDetailBySize.value?.isNotEmpty() == true) {
+
+        val updatedProgressDetail =  progressDetailBySize.value?.get(currentSolutionIndex)
         updatedProgressDetail?.let {
             it.userSolutionList =
                 grid.getQueensIndex() as ArrayList<String>
-            gridSolutionDetailBySize?.forEach { gridSolutionDetail ->
+            gridSolutionDetailBySize.forEach { gridSolutionDetail ->
                 if (gridSolutionDetail.status != Status.COMPLETED.value && it.status != Status.COMPLETED.value) {
                     if (gridSolutionDetail.solutionList.joinToString("") == (it.userSolutionList?.joinToString(
                             ""
                         ))
                     ) {
                         /* dialog.show(
-                             requireActivity().supportFragmentManager,
-                             "GameOverDialogFragment"
-                         )*/
+                                     requireActivity().supportFragmentManager,
+                                     "GameOverDialogFragment"
+                                 )*/
                         gameOverLiveData.value = true
 
                         gridSolutionDetail.userSolutionList = gridSolutionDetail.solutionList
                         gridSolutionDetail.status = Status.COMPLETED.value
                         gridSolutionDetail.statusOrder = currentSolutionIndex
-//                        println("selectedSolutionDetail $selectedSolutionDetail")
-//                        val gameLevelViewModel by ViewModel<GameLevelViewModel>
-//                        gameLevelViewModel.updateStatus(gridSolutionDetail)
-//                        return true
+        //                        println("selectedSolutionDetail $selectedSolutionDetail")
+        //                        val gameLevelViewModel by ViewModel<GameLevelViewModel>
+        //                        gameLevelViewModel.updateStatus(gridSolutionDetail)
+        //                        return true
                         GlobalScope.launch {
                             repository.updateStatus(gridSolutionDetail)
                         }
@@ -108,6 +112,8 @@ class Game(application: Application) {
             }
             updateUserSolution(it)
         }
+        }
+
     }
 
 

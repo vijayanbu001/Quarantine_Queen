@@ -12,15 +12,17 @@
                 app:layout_constraintTop_toTopOf="parent">
 
 
-    <com.google.android.material.appbar.MaterialToolbar
+   <!-- <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolBar"
-            style="@style/Widget.MaterialComponents.Toolbar.Primary"
+            style="@style/Widget.MaterialComponents.Toolbar.PrimarySurface"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:layout_scrollFlags="scroll|enterAlways"
-            app:navigationIcon="@drawable/ic_baseline_menu_24"
-            app:title="@string/app_name" />
+            app:title="@string/app_name" />-->
 
         </com.google.android.material.appbar.AppBarLayout>
 
 </merge>
+
+
+        <!--            app:navigationIcon="@drawable/ic_baseline_menu_24"-->

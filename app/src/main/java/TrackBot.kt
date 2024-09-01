@@ -2,6 +2,7 @@ import com.boardGame.quarantine_queen.Status
 import com.boardGame.quarantine_queen.database.entity.GridDetail
 import com.boardGame.quarantine_queen.database.entity.GridSolutionDetail
 import com.boardGame.quarantine_queen.database.entity.ProgressDetail
+import com.boardGame.quarantine_queen.model.Cell
 import com.boardGame.quarantine_queen.utils.toStringList
 
 class TrackBot {
@@ -11,11 +12,8 @@ class TrackBot {
     private var gridSolutionMap = HashMap<Int, ArrayList<Array<Array<String>>>>()
     private var gridSolutionIndexMap = HashMap<Int, ArrayList<Array<String>>>()
     val gridDetails = ArrayList<GridDetail>()
-        get() = field
     val gridSolutionDetails = ArrayList<GridSolutionDetail>()
-        get() = field
     val progressDetails = ArrayList<ProgressDetail>()
-        get() = field
 
     fun trackBot(grid: Array<Array<String>>) {
         println("TrackBot running with grid size $size")

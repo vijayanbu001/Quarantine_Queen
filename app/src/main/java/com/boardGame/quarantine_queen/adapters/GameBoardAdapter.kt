@@ -78,8 +78,8 @@ class GameBoardAdapter(private val imageList: List<Pair<Int, Int>>) :
      * @param position The position of the item within the adapter's data set.
      */
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        holder.itemView.item_image.setImageResource(imageList.get(position).second)
-        holder.itemView.item_text.text = "${imageList.get(position).first} Queens"
+        holder.itemView.item_image.setImageResource(imageList[position].second)
+        holder.itemView.item_text.text = "${imageList[position].first} Queens"
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)

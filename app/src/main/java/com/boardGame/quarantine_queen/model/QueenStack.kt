@@ -4,7 +4,7 @@ import java.util.*
 
 class QueenStack(private var size: Int) {
     private var stack = Stack<Cell>()
-    private var maxQueenCount = size;
+    private var maxQueenCount = size
 
     init {
         for (index in 0 until size) {

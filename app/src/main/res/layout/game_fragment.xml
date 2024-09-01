@@ -6,24 +6,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context="com.boardGame.quarantine_queen.fragments.GameFragment">
-
         <include layout="@layout/action_bar" />
 
-        <com.boardGame.quarantine_queen.views.BoardView
-                android:id="@+id/boardView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_marginHorizontal="@dimen/xSmall"
-                android:layout_marginTop="?attr/actionBarSize"
-                android:layout_marginBottom="@dimen/xSmall" />
+            <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="?attr/actionBarSize"
+                    android:orientation="vertical">
 
-        <com.boardGame.quarantine_queen.views.CountView
-                android:id="@+id/countView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/boardView"
-                android:layout_margin="@dimen/xSmall"
-                android:padding="@dimen/xSmall" />
+                <com.boardGame.quarantine_queen.views.BoardView
+                        android:id="@+id/boardView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="?attr/actionBarSize"
+                        android:paddingVertical="@dimen/Small" />
+
+                <com.boardGame.quarantine_queen.views.CountView
+                        android:id="@+id/countView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/Small"
+                        android:layout_below="@id/boardView" />
+            </LinearLayout>
 
     </RelativeLayout>
 </layout>

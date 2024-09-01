@@ -28,6 +28,18 @@
                 app:destination="@id/gameLevelFragment" />
     </fragment>
     <fragment
+            android:id="@+id/gameLevelFragment"
+            android:name="com.boardGame.quarantine_queen.fragments.GameLevelFragment"
+            android:label="GameLevelFragment">
+        <argument
+                android:name="gridSize"
+                android:defaultValue="4"
+                app:argType="integer" />
+        <action
+                android:id="@+id/action_gameLevelFragment_to_gameFragment"
+                app:destination="@id/gameFragment" />
+    </fragment>
+    <fragment
             android:id="@+id/gameFragment"
             android:name="com.boardGame.quarantine_queen.fragments.GameFragment"
             android:label="game_fragment"
@@ -41,17 +53,4 @@
                 app:argType="integer"
                 android:defaultValue="0" />
     </fragment>
-    <fragment
-            android:id="@+id/gameLevelFragment"
-            android:name="com.boardGame.quarantine_queen.fragments.GameLevelFragment"
-            android:label="GameLevelFragment">
-        <argument
-                android:name="gridSize"
-                android:defaultValue="4"
-                app:argType="integer" />
-        <action
-                android:id="@+id/action_gameLevelFragment_to_gameFragment"
-                app:destination="@id/gameFragment" />
-    </fragment>
-
 </navigation>

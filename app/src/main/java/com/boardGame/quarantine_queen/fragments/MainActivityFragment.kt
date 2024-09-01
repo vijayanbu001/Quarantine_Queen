@@ -26,7 +26,7 @@ import java.lang.Math.abs
 
 
 class MainActivityFragment : Fragment() {
-    private var themeId: Int = 0;
+    private var themeId: Int = 0
 
     private val viewModel by activityViewModels<GameLevelViewModel>()
     private lateinit var binding: MainActivityFragmentBinding
@@ -41,7 +41,7 @@ class MainActivityFragment : Fragment() {
     }
 
     override fun onAttach(context: Context) {
-        context.theme.applyStyle(themeId, true); //blue ripple color
+        context.theme.applyStyle(themeId, true) //blue ripple color
         super.onAttach(context)
     }
 
@@ -94,14 +94,14 @@ class MainActivityFragment : Fragment() {
     }
 
     private fun setTheme(resId: Int) {
-        themeId = resId;
+        themeId = resId
         setCurrentTheme(requireActivity(), themeId, true)
     }
 
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        println("onOptionsItemSelected $item");
-        return when (item?.itemId) {
+        println("onOptionsItemSelected $item")
+        return when (item.itemId) {
             R.id.theme -> {
                 setTheme(getAlternateTheme(themeId))
                 true
@@ -114,7 +114,7 @@ class MainActivityFragment : Fragment() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
-        var themeIcon = menu?.findItem(R.id.theme)
+        var themeIcon = menu.findItem(R.id.theme)
         if (themeId == R.style.LightTheme) {
             themeIcon?.setIcon(R.drawable.ic_twotone_bedtime_24)
         } else {

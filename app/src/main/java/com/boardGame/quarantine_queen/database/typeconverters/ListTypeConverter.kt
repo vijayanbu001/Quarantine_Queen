@@ -10,7 +10,7 @@ import java.lang.reflect.Type
 class ListTypeConverter{
     @TypeConverter
     fun fromString(value: String?): ArrayList<String?>? {
-        val listType: Type = object : TypeToken<ArrayList<String?>?>() {}.getType()
+        val listType: Type = object : TypeToken<ArrayList<String?>?>() {}.type
         return Gson().fromJson(value, listType)
     }
 

@@ -20,7 +20,6 @@ class SplashScreenFragment : Fragment() {
 
     private val viewModel by activityViewModels<GameLevelViewModel>()
 
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

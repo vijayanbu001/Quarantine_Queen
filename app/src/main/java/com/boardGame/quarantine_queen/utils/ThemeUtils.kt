@@ -7,7 +7,7 @@ import com.boardGame.quarantine_queen.R
 
 object ThemeUtils {
     private var defaultThemeId = R.style.LightTheme
-    private var currentTheme = defaultThemeId;
+    private var currentTheme = defaultThemeId
     fun setCurrentTheme(activity: Activity, themeId: Int, recreate: Boolean = false) {
         currentTheme = themeId
         with(activity.getPreferences(AppCompatActivity.MODE_PRIVATE).edit()) {

@@ -56,7 +56,7 @@ class Cell(private var row: Int, private var column: Int) {
         }
         this.setSafe()
         cell.setSafe()
-        return conflictCell;
+        return conflictCell
     }
 }
 

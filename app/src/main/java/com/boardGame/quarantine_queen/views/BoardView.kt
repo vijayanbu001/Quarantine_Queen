@@ -1,17 +1,19 @@
 package com.boardGame.quarantine_queen.views
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
+import android.graphics.*
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
+import com.boardGame.quarantine_queen.R
 import com.boardGame.quarantine_queen.listeners.BoardListener
 import com.boardGame.quarantine_queen.model.Cell
 import com.boardGame.quarantine_queen.utils.GridTheme
 import com.boardGame.quarantine_queen.utils.GridTheme.*
 import com.boardGame.quarantine_queen.utils.drawCellWithDimension
+
 
 class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, attributeSet) {
 
@@ -25,6 +27,7 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     private var selectedRow = -1
     private var selectedColumn = -1
     private var readOnly = false
+    private var cellView: CellView? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         return when (event.action) {
@@ -53,45 +56,20 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         }
     }
 
-
     override fun onDraw(canvas: Canvas) {
-        cellPixel = (width / count).toFloat().minus((0.1)).toFloat()
+        cellPixel = (width / count).toFloat()
+//        cellView = CellView(canvas, cellPixel,cellPixel);
         drawGrid(canvas)
         drawCells(canvas)
         drawGridBorder(canvas)
 //        fillGridCell(canvas)
     }
 
-    private fun addQueen(row: Int, column: Int) {
-        selectedRow = row
-        selectedColumn = column
-//        invalidate()
-    }
-
-    /*  private fun trackBot(r: Int, c: Int) {
-          var i = r
-          var j = c
-          if (i < grid.size) {
-              if (j < grid.size) {
-                  if ((i > -1 && j > -1) && addQueen(i, j)) {
-                      i++
-                      trackBot(i, 0)
-
-                  } else {
-                      if (i > -1 && j > -1) {
-
-                          grid[i][j] = ""
-                          j++
-                          if (j == grid.size) {
-                              i--
-                              j = 0
-                          }
-                          trackBot(i, j)
-                      }
-                  }
-              }
-          }
-      }*/
+//    private fun addQueen(row: Int, column: Int) {
+//        selectedRow = row
+//        selectedColumn = column
+////        invalidate()
+//    }
 
     /*  private fun drawHints(canvas: Canvas, row: Int, column: Int) {
           if (grid[row][column] !== grid[selectedRow][selectedColumn]
@@ -121,6 +99,42 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         )
     }
 
+    private fun placeQueenImage(canvas: Canvas, row: Int, column: Int) {
+        drawCell(
+            canvas,
+            row,
+            column,
+            if (this.grid?.get(row)?.get(column)
+                    ?.isSafe() == true
+            ) SELECTED_CELL.paint else CONFLICT_CELL.paint
+        )
+        val bounds = Rect()
+        TEXT_CELL.paint.getTextBounds("Q", 0, 1, bounds)
+        val textWidth: Int = bounds.width()
+        val textHeight: Int = bounds.height()
+            val imageWidth:Int = cellPixel.toInt();
+            val imageHeight:Int = cellPixel.toInt();
+        ContextCompat.getDrawable(context, R.drawable.queen_crown_24)?.let {
+//            it.setBounds(0,0,textWidth,textHeight);
+            val queen1: Bitmap=  it.toBitmap();
+            println("~~~~~~> $textWidth, $textHeight, $imageWidth, ${it.bounds}");
+            val queen = Bitmap.createScaledBitmap(
+                it.toBitmap(), imageWidth, imageHeight, false
+            )
+            canvas.drawBitmap(queen,
+                (row * cellPixel) ,
+                (column * cellPixel),
+                null);
+        }
+//        val queen: Bitmap = BitmapFactory.decodeResource(resources, R.drawable.queen_crown)
+
+            /* canvas.drawText(
+                 "Q",
+                 (row * cellPixel) + (cellPixel / 2) - (textWidth / 2),
+                 (column * cellPixel) + (cellPixel / 2) + (textHeight / 2),
+                 TEXT_CELL.paint
+             )*/
+    }
 
     /* private fun fillGridCell(canvas: Canvas) {
          if (selectedColumn == -1 || selectedRow == -1) return
@@ -159,18 +173,22 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
     }
 
     private fun drawGridBorder(canvas: Canvas) {
-        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), cellPixel,count)
+        println("=>>>>, ${width.toFloat()}")
+        drawCellWithDimension(canvas, 0f, 0f, GridTheme.LINE.paint, width.toFloat(), width.toFloat(),count)
     }
 
-    private fun drawCells(canvas: Canvas) {
+    private fun drawCells(canvas:Canvas) {
         for (row in 0 until count) {
             for (col in 0 until count) {
                 println("row $row column $col")
                 if (!grid.isNullOrEmpty() && grid?.get(row)?.get(col)?.hasQueen() == true) {
-
-                    placeQueen(canvas, row, col)
+                    var colour:Paint = if(this.grid?.get(row)?.get(col)?.isSafe()!!) GridTheme.SELECTED_CELL.paint else GridTheme.CONFLICT_CELL.paint
+//                    cellView?.placeQueen(row, col, cellPixel, colour);
+//                    placeQueen(canvas,row, col)
+                    placeQueenImage(canvas,row,col);
                 } else {
-                    drawCell(canvas, row, col, BLANK_CELL.paint)
+                    drawCell(canvas,row, col,BLANK_CELL.paint)
+//                    cellView?.drawCell(row, col, BLANK_CELL.paint);
                 }
             }
         }
@@ -183,7 +201,8 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
             0f,
             BACK_GROUND.paint,
             width.toFloat(),
-            width.toFloat(),count
+            width.toFloat(),
+            count
         )
     }
 
@@ -191,9 +210,9 @@ class BoardView(context: Context?, attributeSet: AttributeSet) : View(context, a
         this.listener = listener
     }
 
-    fun addSelectedCell(row: Int, col: Int) {
-        addQueen(row, col)
-    }
+//    fun addSelectedCell(row: Int, col: Int) {
+//        addQueen(row, col)
+//    }
 
     fun updateQueenCount(value: Int) {
         availableQueen = value
